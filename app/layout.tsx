@@ -96,6 +96,14 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="fr" className={`${inter.variable} ${poppins.variable}`}>
+      <head>
+        {/* Prevent white flash during splash: set bg immediately if first visit */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `(function(){if(!sessionStorage.getItem('adpulse_splash_shown')){document.documentElement.style.background='#ffffff';document.documentElement.style.overflow='hidden';}})();`,
+          }}
+        />
+      </head>
       <body className="bg-background font-sans antialiased">
         <SplashScreenLazy />
         {children}

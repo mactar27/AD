@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import Image from 'next/image'
 import { ArrowRight, Globe, Megaphone, PenTool, CheckCircle2 } from 'lucide-react'
 
-const BG = '#0a1628'
+const BG = '#ffffff'
 
 const steps = [
   {
@@ -44,9 +44,7 @@ export function SplashScreen() {
     if (sessionStorage.getItem('adpulse_splash_shown')) return
     sessionStorage.setItem('adpulse_splash_shown', '1')
     setVisible(true)
-
-    // Auto-advance from logo to onboard
-    const t = setTimeout(() => setPhase('onboard'), 2000)
+    const t = setTimeout(() => setPhase('onboard'), 2200)
     return () => clearTimeout(t)
   }, [])
 
@@ -54,10 +52,15 @@ export function SplashScreen() {
     if (step < steps.length - 1) {
       setStep((s) => s + 1)
     } else {
-      // Last step: fade out and hide
-      setLeaving(true)
-      setTimeout(() => setVisible(false), 700)
+      dismiss()
     }
+  }
+
+  function dismiss() {
+    setLeaving(true)
+    document.documentElement.style.background = ''
+    document.documentElement.style.overflow = ''
+    setTimeout(() => setVisible(false), 600)
   }
 
   if (!visible) return null
@@ -72,90 +75,87 @@ export function SplashScreen() {
           key="splash"
           initial={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          transition={{ duration: 0.7 }}
+          transition={{ duration: 0.6 }}
           style={{ background: BG }}
           className="fixed inset-0 z-[9999] flex items-center justify-center overflow-hidden"
         >
-          {/* Blobs */}
+          {/* Subtle background blobs */}
           <div className="pointer-events-none absolute inset-0 overflow-hidden">
-            <motion.div
-              animate={{ scale: [1, 1.2, 1], opacity: [0.25, 0.45, 0.25] }}
-              transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }}
-              style={{ background: 'rgba(37,99,235,0.25)', filter: 'blur(100px)' }}
-              className="absolute left-1/4 top-1/4 h-96 w-96 -translate-x-1/2 -translate-y-1/2 rounded-full"
+            <div
+              style={{ background: 'rgba(37,99,235,0.06)', filter: 'blur(80px)' }}
+              className="absolute -top-32 -left-32 h-96 w-96 rounded-full"
             />
-            <motion.div
-              animate={{ scale: [1, 1.3, 1], opacity: [0.15, 0.3, 0.15] }}
-              transition={{ duration: 5, repeat: Infinity, ease: 'easeInOut', delay: 1 }}
-              style={{ background: 'rgba(34,211,238,0.18)', filter: 'blur(120px)' }}
-              className="absolute bottom-1/4 right-1/4 h-80 w-80 translate-x-1/2 translate-y-1/2 rounded-full"
+            <div
+              style={{ background: 'rgba(139,92,246,0.05)', filter: 'blur(100px)' }}
+              className="absolute -bottom-32 -right-32 h-96 w-96 rounded-full"
             />
           </div>
 
-          {/* Phase 1: Logo */}
           <AnimatePresence mode="wait">
+            {/* Phase 1: Logo */}
             {phase === 'logo' && (
               <motion.div
                 key="logo"
-                initial={{ opacity: 0, scale: 0.8 }}
+                initial={{ opacity: 0, scale: 0.85 }}
                 animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 1.1, y: -20 }}
-                transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+                exit={{ opacity: 0, scale: 1.05, y: -16 }}
+                transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
                 className="flex flex-col items-center gap-6"
               >
-                <motion.div
-                  animate={{ boxShadow: ['0 0 0px rgba(37,99,235,0)', '0 0 40px 20px rgba(37,99,235,0.3)', '0 0 0px rgba(37,99,235,0)'] }}
-                  transition={{ duration: 2, repeat: Infinity }}
-                  style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)' }}
+                {/* Logo */}
+                <div
+                  style={{ background: '#f1f5f9', border: '1px solid #e2e8f0' }}
                   className="flex h-24 w-24 items-center justify-center rounded-3xl overflow-hidden"
                 >
                   <Image src="/icon.png" alt="AD PULSE" width={64} height={64} className="object-contain" />
-                </motion.div>
+                </div>
 
-                <motion.p
-                  initial={{ opacity: 0, y: 8 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.4 }}
-                  className="text-2xl font-bold tracking-widest text-white"
+                <p
+                  style={{ color: '#0f172a' }}
+                  className="text-2xl font-extrabold tracking-widest"
                 >
                   AD PULSE
-                </motion.p>
+                </p>
 
-                <div style={{ background: 'rgba(255,255,255,0.1)' }} className="h-0.5 w-32 overflow-hidden rounded-full">
+                {/* Loading bar */}
+                <div style={{ background: '#e2e8f0' }} className="h-1 w-36 overflow-hidden rounded-full">
                   <motion.div
                     initial={{ width: '0%' }}
                     animate={{ width: '100%' }}
-                    transition={{ duration: 1.8, ease: 'easeInOut' }}
-                    style={{ background: 'linear-gradient(to right, #3b82f6, #22d3ee)' }}
-                    className="h-full"
+                    transition={{ duration: 2, ease: 'easeInOut' }}
+                    style={{ background: 'linear-gradient(to right, #2563eb, #7c3aed)' }}
+                    className="h-full rounded-full"
                   />
                 </div>
+
+                <p style={{ color: '#94a3b8' }} className="text-xs tracking-wider uppercase">
+                  Agence digitale — Dakar
+                </p>
               </motion.div>
             )}
 
-            {/* Phase 2: Onboarding steps */}
+            {/* Phase 2: Onboarding */}
             {phase === 'onboard' && (
               <motion.div
                 key="onboard"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
-                transition={{ duration: 0.5 }}
+                transition={{ duration: 0.45 }}
                 style={{ background: BG }}
                 className="absolute inset-0 flex flex-col items-center justify-center px-6"
               >
-                {/* Step content */}
                 <AnimatePresence mode="wait">
                   <motion.div
                     key={step}
-                    initial={{ opacity: 0, x: 40 }}
+                    initial={{ opacity: 0, x: 50 }}
                     animate={{ opacity: 1, x: 0 }}
-                    exit={{ opacity: 0, x: -40 }}
-                    transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
-                    className="flex max-w-lg flex-col items-center gap-6 text-center"
+                    exit={{ opacity: 0, x: -50 }}
+                    transition={{ duration: 0.38, ease: [0.22, 1, 0.36, 1] }}
+                    className="flex max-w-md flex-col items-center gap-5 text-center"
                   >
                     {/* Icon */}
                     <div
-                      style={{ background: `${current.color}22`, border: `1px solid ${current.color}44` }}
+                      style={{ background: `${current.color}14`, border: `1px solid ${current.color}30` }}
                       className="flex h-20 w-20 items-center justify-center rounded-3xl"
                     >
                       <Icon style={{ color: current.color }} className="h-10 w-10" />
@@ -163,28 +163,28 @@ export function SplashScreen() {
 
                     {/* Badge */}
                     <span
-                      style={{ background: `${current.color}1a`, border: `1px solid ${current.color}44`, color: current.color }}
-                      className="rounded-full px-4 py-1.5 text-xs font-bold uppercase tracking-widest"
+                      style={{ background: `${current.color}10`, border: `1px solid ${current.color}30`, color: current.color }}
+                      className="rounded-full px-4 py-1.5 text-[11px] font-bold uppercase tracking-widest"
                     >
                       {current.badge}
                     </span>
 
                     {/* Title */}
-                    <h2 className="text-3xl font-extrabold leading-tight text-white sm:text-4xl">
+                    <h2 style={{ color: '#0f172a' }} className="text-3xl font-extrabold leading-tight sm:text-4xl">
                       {current.title}
                     </h2>
 
                     {/* Description */}
-                    <p style={{ color: '#94a3b8' }} className="text-base leading-relaxed">
+                    <p style={{ color: '#64748b' }} className="text-sm leading-relaxed">
                       {current.description}
                     </p>
 
                     {/* Checklist */}
-                    <ul className="space-y-2 text-left w-full max-w-xs">
+                    <ul className="w-full max-w-xs space-y-2 text-left">
                       {['Expertise locale Dakar', 'Livraison rapide', 'Support continu'].map((item) => (
                         <li key={item} className="flex items-center gap-3">
                           <CheckCircle2 style={{ color: current.color }} className="h-4 w-4 shrink-0" />
-                          <span style={{ color: '#cbd5e1' }} className="text-sm">{item}</span>
+                          <span style={{ color: '#475569' }} className="text-sm">{item}</span>
                         </li>
                       ))}
                     </ul>
@@ -192,7 +192,7 @@ export function SplashScreen() {
                 </AnimatePresence>
 
                 {/* Bottom controls */}
-                <div className="absolute bottom-12 flex w-full max-w-lg flex-col items-center gap-6 px-6">
+                <div className="absolute bottom-10 flex w-full max-w-sm flex-col items-center gap-5 px-6">
                   {/* Dots */}
                   <div className="flex items-center gap-2">
                     {steps.map((_, i) => (
@@ -202,9 +202,11 @@ export function SplashScreen() {
                         style={{
                           width: i === step ? 24 : 8,
                           height: 8,
-                          background: i === step ? current.color : 'rgba(255,255,255,0.2)',
+                          background: i === step ? current.color : '#e2e8f0',
                           borderRadius: 999,
                           transition: 'all 0.3s',
+                          border: 'none',
+                          cursor: 'pointer',
                         }}
                       />
                     ))}
@@ -213,7 +215,10 @@ export function SplashScreen() {
                   {/* CTA Button */}
                   <button
                     onClick={handleNext}
-                    style={{ background: `linear-gradient(135deg, #2563eb, #1d4ed8)`, boxShadow: '0 8px 30px rgba(37,99,235,0.4)' }}
+                    style={{
+                      background: `linear-gradient(135deg, ${current.color}, #1d4ed8)`,
+                      boxShadow: `0 8px 24px ${current.color}40`,
+                    }}
                     className="flex w-full items-center justify-center gap-2 rounded-full py-4 text-sm font-bold text-white transition-transform hover:-translate-y-0.5 active:scale-95"
                   >
                     {step < steps.length - 1 ? (
@@ -225,9 +230,9 @@ export function SplashScreen() {
 
                   {step < steps.length - 1 && (
                     <button
-                      onClick={() => { setLeaving(true); setTimeout(() => setVisible(false), 700) }}
-                      style={{ color: '#64748b' }}
-                      className="text-xs hover:text-slate-400 transition-colors"
+                      onClick={dismiss}
+                      style={{ color: '#94a3b8', background: 'none', border: 'none', cursor: 'pointer' }}
+                      className="text-xs hover:text-slate-500 transition-colors"
                     >
                       Passer l'introduction
                     </button>
