@@ -44,7 +44,7 @@ export function SplashScreen() {
     if (sessionStorage.getItem('adpulse_splash_shown')) return
     sessionStorage.setItem('adpulse_splash_shown', '1')
     setVisible(true)
-    const t = setTimeout(() => setPhase('onboard'), 2200)
+    const t = setTimeout(() => setPhase('onboard'), 5000)
     return () => clearTimeout(t)
   }, [])
 
@@ -115,7 +115,7 @@ export function SplashScreen() {
                   <motion.div
                     initial={{ width: '0%' }}
                     animate={{ width: '100%' }}
-                    transition={{ duration: 2, ease: 'easeInOut' }}
+                    transition={{ duration: 4.7, ease: 'easeInOut' }}
                     style={{ background: 'linear-gradient(to right, #2563eb, #7c3aed)' }}
                     className="h-full rounded-full"
                   />
