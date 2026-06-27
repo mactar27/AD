@@ -6,15 +6,7 @@ import { MessageCircle, Mail, Phone, MapPin } from 'lucide-react'
 import { FaFacebook, FaLinkedin, FaInstagram } from 'react-icons/fa'
 import { Logo } from '@/components/logo'
 import { contactInfo } from '@/lib/site-data'
-
-const quickLinks = [
-  { label: 'Accueil', href: '#accueil' },
-  { label: 'Services', href: '#services' },
-  { label: 'Réalisations', href: '#realisations' },
-  { label: 'À propos', href: '#pourquoi-nous' },
-  { label: 'FAQ', href: '#faq' },
-  { label: 'Contact', href: '#contact' },
-]
+import { useLanguage } from '@/lib/i18n'
 
 const serviceLinks = [
   'Développement Web',
@@ -29,12 +21,13 @@ const socials = [
   { icon: FaFacebook, href: 'https://facebook.com', label: 'Facebook' },
   { icon: FaLinkedin, href: 'https://linkedin.com', label: 'LinkedIn' },
   { icon: FaInstagram, href: 'https://instagram.com', label: 'Instagram' },
-  { icon: MessageCircle, href: `https://wa.me/${contactInfo.whatsapp.replace(/\D/g, '')}`, label: 'WhatsApp' },
+  { icon: MessageCircle, href: `https://wa.me/${contactInfo.whatsapp.replace(/\\D/g, '')}`, label: 'WhatsApp' },
 ]
 
 export function Footer() {
   const [email, setEmail] = useState('')
   const [subscribed, setSubscribed] = useState(false)
+  const { t } = useLanguage()
 
   return (
     <footer className="bg-brand-dark text-white">
@@ -43,9 +36,7 @@ export function Footer() {
           <div className="lg:col-span-2">
             <Logo variant="light" />
             <p className="mt-4 max-w-sm text-sm leading-relaxed text-white/70">
-              AD PULSE est une agence digitale spécialisée dans le développement web, le marketing
-              digital et la communication. Nous créons des solutions sur mesure pour faire grandir
-              votre entreprise.
+              {t.footer.tagline}
             </p>
             <div className="mt-6 flex gap-3">
               {socials.map((s) => (
@@ -64,9 +55,9 @@ export function Footer() {
           </div>
 
           <div>
-            <h3 className="font-heading text-sm font-bold uppercase tracking-wide text-white">Liens rapides</h3>
+            <h3 className="font-heading text-sm font-bold uppercase tracking-wide text-white">{t.footer.quickLinks}</h3>
             <ul className="mt-4 space-y-2.5">
-              {quickLinks.map((link) => (
+              {t.footer.links.map((link) => (
                 <li key={link.label}>
                   <Link href={link.href} className="text-sm text-white/70 transition-colors hover:text-brand-light">
                     {link.label}
@@ -77,8 +68,9 @@ export function Footer() {
           </div>
 
           <div>
-            <h3 className="font-heading text-sm font-bold uppercase tracking-wide text-white">Nos services</h3>
+            <h3 className="font-heading text-sm font-bold uppercase tracking-wide text-white">{t.footer.ourServices}</h3>
             <ul className="mt-4 space-y-2.5">
+              {/* Here we could also map serviceLinks to translations but we'll use original for now */}
               {serviceLinks.map((s) => (
                 <li key={s}>
                   <a href="#services" className="text-sm text-white/70 transition-colors hover:text-brand-light">
@@ -90,8 +82,8 @@ export function Footer() {
           </div>
 
           <div>
-            <h3 className="font-heading text-sm font-bold uppercase tracking-wide text-white">Newsletter</h3>
-            <p className="mt-4 text-sm text-white/70">Recevez nos actualités et conseils digitaux.</p>
+            <h3 className="font-heading text-sm font-bold uppercase tracking-wide text-white">{t.footer.newsletter}</h3>
+            <p className="mt-4 text-sm text-white/70">{t.footer.newsletterDesc}</p>
             <form
               onSubmit={(e) => {
                 e.preventDefault()
@@ -104,15 +96,15 @@ export function Footer() {
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="Votre email"
-                aria-label="Votre email"
+                placeholder={t.footer.emailPlaceholder}
+                aria-label={t.footer.emailPlaceholder}
                 className="w-full rounded-xl border border-white/15 bg-white/10 px-4 py-2.5 text-sm text-white outline-none placeholder:text-white/50 focus:border-brand-light"
               />
               <button
                 type="submit"
                 className="rounded-xl bg-brand-light px-4 py-2.5 text-sm font-semibold text-brand-dark transition-opacity hover:opacity-90"
               >
-                {subscribed ? 'Merci !' : "S'abonner"}
+                {subscribed ? t.footer.subscribed : t.footer.subscribe}
               </button>
             </form>
             <ul className="mt-6 space-y-2 text-sm text-white/70">
@@ -124,13 +116,13 @@ export function Footer() {
         </div>
 
         <div className="mt-12 flex flex-col items-center justify-between gap-4 border-t border-white/10 pt-8 text-sm text-white/60 sm:flex-row">
-          <p>© {new Date().getFullYear()} AD PULSE. Tous droits réservés.</p>
+          <p>© {new Date().getFullYear()} AD PULSE. {t.footer.rights}</p>
           <div className="flex gap-6">
             <Link href="/mentions-legales" className="transition-colors hover:text-brand-light">
-              Mentions légales
+              {t.footer.legal}
             </Link>
             <Link href="/politique-de-confidentialite" className="transition-colors hover:text-brand-light">
-              Politique de confidentialité
+              {t.footer.privacy}
             </Link>
           </div>
         </div>

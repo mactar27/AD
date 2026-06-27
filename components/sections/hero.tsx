@@ -3,6 +3,7 @@
 import Image from 'next/image'
 import { motion } from 'framer-motion'
 import { ArrowRight, PlayCircle, Star, Users } from 'lucide-react'
+import { useLanguage } from '@/lib/i18n'
 
 const container = {
   hidden: {},
@@ -14,6 +15,8 @@ const item = {
 }
 
 export function Hero() {
+  const { t } = useLanguage()
+
   return (
     <section
       id="accueil"
@@ -38,13 +41,12 @@ export function Hero() {
             variants={item}
             className="font-heading text-4xl font-extrabold leading-[1.08] tracking-tight text-balance sm:text-5xl lg:text-6xl"
           >
-            Votre partenaire digital pour créer les{' '}
-            <span className="text-gradient">solutions qui font grandir</span> votre entreprise.
+            {t.hero.title1}{' '}
+            <span className="text-gradient">{t.hero.titleHighlight}</span>{t.hero.title2}
           </motion.h1>
 
           <motion.p variants={item} className="mt-6 max-w-xl text-lg leading-relaxed text-muted-foreground text-pretty">
-            Chez AD PULSE, nous transformons vos idées en applications, plateformes web et
-            stratégies digitales performantes.
+            {t.hero.subtitle}
           </motion.p>
 
           <motion.div variants={item} className="mt-8 flex flex-col gap-3 sm:flex-row">
@@ -52,7 +54,7 @@ export function Hero() {
               href="#contact"
               className="inline-flex items-center justify-center gap-2 rounded-full bg-brand-gradient px-7 py-3.5 text-sm font-semibold text-primary-foreground shadow-soft transition-transform hover:-translate-y-0.5"
             >
-              Demander un devis
+              {t.hero.cta1}
               <ArrowRight className="size-4" />
             </a>
             <a
@@ -60,7 +62,7 @@ export function Hero() {
               className="inline-flex items-center justify-center gap-2 rounded-full border border-border bg-background px-7 py-3.5 text-sm font-semibold text-foreground transition-colors hover:border-brand/40 hover:text-brand"
             >
               <PlayCircle className="size-4 text-brand" />
-              Découvrir nos services
+              {t.hero.cta2}
             </a>
           </motion.div>
 
@@ -74,7 +76,7 @@ export function Hero() {
                   <Star key={i} className="size-4 fill-current text-amber-400" />
                 ))}
               </div>
-              <p className="mt-0.5 text-sm text-muted-foreground">30+ clients nous font déjà confiance</p>
+              <p className="mt-0.5 text-sm text-muted-foreground">{t.hero.social}</p>
             </div>
           </motion.div>
         </motion.div>

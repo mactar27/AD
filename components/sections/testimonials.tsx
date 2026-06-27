@@ -1,31 +1,33 @@
 'use client'
 
 import { useState } from 'react'
-import Image from 'next/image'
 import { AnimatePresence, motion } from 'framer-motion'
 import { ChevronLeft, ChevronRight, Quote, Star } from 'lucide-react'
 import { SectionHeading } from '@/components/section-heading'
-import { testimonials } from '@/lib/site-data'
+import { useLanguage } from '@/lib/i18n'
 import { cn } from '@/lib/utils'
 
 export function Testimonials() {
   const [index, setIndex] = useState(0)
   const [dir, setDir] = useState(1)
+  const { t } = useLanguage()
+
+  const testimonials = t.data.testimonials
 
   const go = (next: number) => {
     setDir(next > index || (index === testimonials.length - 1 && next === 0) ? 1 : -1)
     setIndex((next + testimonials.length) % testimonials.length)
   }
 
-  const t = testimonials[index]
+  const currentTestimonial = testimonials[index]
 
   return (
     <section className="bg-secondary/60 py-24">
       <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
         <SectionHeading
-          eyebrow="Témoignages"
-          title="Ils parlent de nous"
-          description="La satisfaction de nos clients est la meilleure preuve de notre engagement."
+          eyebrow={t.testimonials.eyebrow}
+          title={t.testimonials.title}
+          description={t.testimonials.description}
         />
 
         <div className="relative mt-12">
@@ -41,20 +43,20 @@ export function Testimonials() {
                 transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
               >
                 <div className="mt-2 flex items-center gap-1 text-amber-400">
-                  {Array.from({ length: t.rating }).map((_, i) => (
+                  {Array.from({ length: currentTestimonial.rating }).map((_, i) => (
                     <Star key={i} className="size-5 fill-current" />
                   ))}
                 </div>
                 <blockquote className="mt-4 font-heading text-xl font-semibold leading-relaxed text-foreground text-pretty sm:text-2xl">
-                  “{t.quote}”
+                  “{currentTestimonial.quote}”
                 </blockquote>
                 <div className="mt-6 flex items-center gap-4">
                   <div className="flex size-14 shrink-0 items-center justify-center rounded-full bg-brand/10 text-xl font-bold text-brand border-2 border-background">
-                    {t.name.charAt(0)}
+                    {currentTestimonial.name.charAt(0)}
                   </div>
                   <div>
-                    <p className="font-heading font-bold text-foreground">{t.name}</p>
-                    <p className="text-sm text-muted-foreground">{t.role}</p>
+                    <p className="font-heading font-bold text-foreground">{currentTestimonial.name}</p>
+                    <p className="text-sm text-muted-foreground">{currentTestimonial.role}</p>
                   </div>
                 </div>
               </motion.div>
@@ -65,7 +67,7 @@ export function Testimonials() {
             <button
               type="button"
               onClick={() => go(index - 1)}
-              aria-label="Témoignage précédent"
+              aria-label={t.testimonials.prev}
               className="flex size-11 items-center justify-center rounded-full border border-border bg-card text-foreground transition-colors hover:border-brand/40 hover:text-brand"
             >
               <ChevronLeft className="size-5" />
@@ -75,7 +77,7 @@ export function Testimonials() {
                 <button
                   key={i}
                   type="button"
-                  aria-label={`Aller au témoignage ${i + 1}`}
+                  aria-label={`${t.testimonials.goTo} ${i + 1}`}
                   onClick={() => go(i)}
                   className={cn(
                     'h-2 rounded-full transition-all',
@@ -87,7 +89,7 @@ export function Testimonials() {
             <button
               type="button"
               onClick={() => go(index + 1)}
-              aria-label="Témoignage suivant"
+              aria-label={t.testimonials.next}
               className="flex size-11 items-center justify-center rounded-full border border-border bg-card text-foreground transition-colors hover:border-brand/40 hover:text-brand"
             >
               <ChevronRight className="size-5" />

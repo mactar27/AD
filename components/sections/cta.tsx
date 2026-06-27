@@ -2,8 +2,11 @@
 
 import { motion } from 'framer-motion'
 import { ArrowRight, Fingerprint } from 'lucide-react'
+import { useLanguage } from '@/lib/i18n'
 
 export function Cta() {
+  const { t } = useLanguage()
+
   return (
     <section className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
       <motion.div
@@ -21,17 +24,17 @@ export function Cta() {
         <div className="relative flex flex-col items-start justify-between gap-6 lg:flex-row lg:items-center">
           <div>
             <h2 className="font-heading text-2xl font-extrabold text-white text-balance sm:text-3xl">
-              Prêt à transformer votre projet en succès ?
+              {t.cta.title}
             </h2>
             <p className="mt-2 max-w-xl text-white/80">
-              Parlons de votre projet et construisons ensemble des solutions digitales performantes.
+              {t.cta.subtitle}
             </p>
           </div>
           <a
             href="#contact"
             className="inline-flex shrink-0 items-center gap-2 rounded-full bg-white px-7 py-3.5 text-sm font-semibold text-brand shadow-lg transition-transform hover:-translate-y-0.5"
           >
-            Contactez-nous
+            {t.cta.button}
             <ArrowRight className="size-4" />
           </a>
         </div>

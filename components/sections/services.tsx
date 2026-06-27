@@ -3,8 +3,11 @@
 import { motion } from 'framer-motion'
 import { ArrowRight, Globe, Code2, ShoppingCart, Smartphone, Search, Megaphone, PenTool, Cloud, Rocket, CheckCircle2, Users } from 'lucide-react'
 import Image from 'next/image'
+import { useLanguage } from '@/lib/i18n'
 
 export function Services() {
+  const { t } = useLanguage()
+
   return (
     <section id="services" className="relative py-24 bg-[#fafbfd] overflow-hidden">
       {/* Background decorations */}
@@ -15,14 +18,14 @@ export function Services() {
         
         {/* Header */}
         <div className="text-center max-w-3xl mx-auto mb-16">
-          <p className="text-sm font-bold tracking-widest text-blue-600 uppercase mb-4">Nos Services</p>
+          <p className="text-sm font-bold tracking-widest text-blue-600 uppercase mb-4">{t.services.eyebrow}</p>
           <h2 className="text-4xl md:text-5xl font-extrabold text-[#0f172a] tracking-tight mb-6">
-            Des solutions digitales complètes<br />
-            pour accélérer votre <span className="text-blue-600">croissance</span>
+            {t.services.title1}<br />
+            {t.services.title2} <span className="text-blue-600">{t.services.titleHighlight}</span>
           </h2>
           <p className="text-lg text-slate-500">
-            Nous concevons, développons et pilotons des solutions sur mesure<br className="hidden md:block" />
-            qui répondent à vos objectifs business.
+            {t.services.description1}<br className="hidden md:block" />
+            {t.services.description2}
           </p>
         </div>
 
@@ -38,12 +41,12 @@ export function Services() {
               <div className="w-12 h-12 rounded-2xl bg-white/10 flex items-center justify-center mb-6 border border-white/10">
                 <Globe className="w-6 h-6 text-white" />
               </div>
-              <h3 className="text-2xl font-bold mb-3">Création de<br/>Sites Web</h3>
+              <h3 className="text-2xl font-bold mb-3 whitespace-pre-line">{t.services.cards.web.title}</h3>
               <p className="text-blue-100 text-sm leading-relaxed mb-8">
-                Des sites vitrines modernes, rapides et optimisés pour convertir vos visiteurs.
+                {t.services.cards.web.desc}
               </p>
               <a href="#contact" className="inline-flex items-center gap-2 bg-white/15 hover:bg-white/25 transition-colors rounded-full px-5 py-2.5 text-sm font-medium backdrop-blur-sm w-fit">
-                Découvrir <ArrowRight className="w-4 h-4" />
+                {t.services.discover} <ArrowRight className="w-4 h-4" />
               </a>
             </div>
             
@@ -70,7 +73,7 @@ export function Services() {
                 <div className="w-8 h-8 rounded bg-white/10 flex items-center justify-center"><Globe className="w-4 h-4" /></div>
                 <div>
                   <p className="text-lg font-bold">120+</p>
-                  <p className="text-[10px] text-blue-200 uppercase tracking-wider">Projets réalisés</p>
+                  <p className="text-[10px] text-blue-200 uppercase tracking-wider">{t.services.cards.web.projects}</p>
                 </div>
               </div>
               <div className="w-px h-8 bg-white/20" />
@@ -78,7 +81,7 @@ export function Services() {
                 <div className="w-8 h-8 rounded bg-amber-400/20 flex items-center justify-center"><StarIcon className="w-4 h-4 text-amber-400" /></div>
                 <div>
                   <p className="text-lg font-bold">4.9/5</p>
-                  <p className="text-[10px] text-blue-200 uppercase tracking-wider">Satisfaction</p>
+                  <p className="text-[10px] text-blue-200 uppercase tracking-wider">{t.services.cards.web.satisfaction}</p>
                 </div>
               </div>
             </div>
@@ -92,16 +95,16 @@ export function Services() {
             <div className="w-12 h-12 rounded-2xl bg-blue-50 flex items-center justify-center mb-6 text-blue-600">
               <Code2 className="w-6 h-6" />
             </div>
-            <h3 className="text-xl font-bold text-slate-900 mb-3">Applications Web<br/>Sur Mesure</h3>
+            <h3 className="text-xl font-bold text-slate-900 mb-3 whitespace-pre-line">{t.services.cards.apps.title}</h3>
             <p className="text-slate-500 text-sm leading-relaxed mb-6 flex-1">
-              Des applications robustes, évolutives et sécurisées adaptées à vos besoins.
+              {t.services.cards.apps.desc}
             </p>
             
             {/* Mini Illustration Dashboard */}
             <div className="h-40 bg-slate-50/50 rounded-2xl border border-slate-100 p-4 mb-6 relative overflow-hidden group-hover:scale-[1.02] transition-transform duration-500">
               <div className="flex justify-between items-end mb-4">
                 <div>
-                  <div className="text-[10px] text-slate-400 font-medium mb-1">Dashboard</div>
+                  <div className="text-[10px] text-slate-400 font-medium mb-1">{t.services.cards.apps.dashboard}</div>
                   <div className="w-16 h-2 bg-slate-200 rounded-full" />
                 </div>
                 <div className="bg-emerald-100 text-emerald-600 text-[10px] font-bold px-2 py-1 rounded-md">+12.5%</div>
@@ -121,7 +124,7 @@ export function Services() {
             </div>
 
             <a href="#contact" className="inline-flex items-center gap-2 text-sm font-semibold text-blue-600 group-hover:gap-3 transition-all">
-              Découvrir <ArrowRight className="w-4 h-4" />
+              {t.services.discover} <ArrowRight className="w-4 h-4" />
             </a>
           </motion.div>
 
@@ -133,9 +136,9 @@ export function Services() {
             <div className="w-12 h-12 rounded-2xl bg-emerald-50 flex items-center justify-center mb-6 text-emerald-600">
               <ShoppingCart className="w-6 h-6" />
             </div>
-            <h3 className="text-xl font-bold text-slate-900 mb-3">E-commerce<br/>Avancé</h3>
+            <h3 className="text-xl font-bold text-slate-900 mb-3 whitespace-pre-line">{t.services.cards.ecommerce.title}</h3>
             <p className="text-slate-500 text-sm leading-relaxed mb-6 flex-1">
-              Des boutiques en ligne performantes, sécurisées et orientées résultats.
+              {t.services.cards.ecommerce.desc}
             </p>
             
             {/* Mini Illustration E-commerce */}
@@ -155,7 +158,7 @@ export function Services() {
             </div>
 
             <a href="#contact" className="inline-flex items-center gap-2 text-sm font-semibold text-emerald-600 group-hover:gap-3 transition-all">
-              Découvrir <ArrowRight className="w-4 h-4" />
+              {t.services.discover} <ArrowRight className="w-4 h-4" />
             </a>
           </motion.div>
 
@@ -167,9 +170,9 @@ export function Services() {
             <div className="w-12 h-12 rounded-2xl bg-purple-50 flex items-center justify-center mb-6 text-purple-600">
               <Smartphone className="w-6 h-6" />
             </div>
-            <h3 className="text-xl font-bold text-slate-900 mb-3">Applications<br/>Mobiles</h3>
+            <h3 className="text-xl font-bold text-slate-900 mb-3 whitespace-pre-line">{t.services.cards.mobile.title}</h3>
             <p className="text-slate-500 text-sm leading-relaxed mb-6 flex-1">
-              Applications iOS et Android modernes, fluides et centrées utilisateur.
+              {t.services.cards.mobile.desc}
             </p>
             
             {/* Mini Illustration Mobile */}
@@ -185,7 +188,7 @@ export function Services() {
             </div>
 
             <a href="#contact" className="inline-flex items-center gap-2 text-sm font-semibold text-purple-600 group-hover:gap-3 transition-all">
-              Découvrir <ArrowRight className="w-4 h-4" />
+              {t.services.discover} <ArrowRight className="w-4 h-4" />
             </a>
           </motion.div>
 
@@ -200,16 +203,16 @@ export function Services() {
               <div className="w-10 h-10 rounded-xl bg-amber-50 flex items-center justify-center text-amber-500">
                 <Search className="w-5 h-5" />
               </div>
-              <h4 className="font-bold text-slate-900 leading-tight">SEO &<br/>Référencement</h4>
+              <h4 className="font-bold text-slate-900 leading-tight whitespace-pre-line">{t.services.cards.seo.title}</h4>
             </div>
             <div className="flex items-end justify-between flex-1">
               <div>
                 <a href="#contact" className="inline-flex items-center gap-1.5 text-xs font-semibold text-amber-500 group-hover:gap-2 transition-all">
-                  Découvrir <ArrowRight className="w-3 h-3" />
+                  {t.services.discover} <ArrowRight className="w-3 h-3" />
                 </a>
               </div>
               <div className="text-right">
-                <div className="text-[10px] text-slate-400 font-medium">Trafic organique</div>
+                <div className="text-[10px] text-slate-400 font-medium">{t.services.cards.seo.traffic}</div>
                 <div className="text-lg font-bold text-slate-900">+310%</div>
                 <svg viewBox="0 0 50 20" className="w-16 h-6 mt-1">
                   <path d="M0,15 L10,12 L20,18 L30,5 L40,8 L50,2" fill="none" stroke="#F59E0B" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
@@ -224,12 +227,12 @@ export function Services() {
               <div className="w-10 h-10 rounded-xl bg-red-50 flex items-center justify-center text-red-500">
                 <Megaphone className="w-5 h-5" />
               </div>
-              <h4 className="font-bold text-slate-900 leading-tight">Publicité<br/>Digitale</h4>
+              <h4 className="font-bold text-slate-900 leading-tight whitespace-pre-line">{t.services.cards.ads.title}</h4>
             </div>
             <div className="flex items-end justify-between flex-1">
               <div>
                 <a href="#contact" className="inline-flex items-center gap-1.5 text-xs font-semibold text-red-500 group-hover:gap-2 transition-all">
-                  Découvrir <ArrowRight className="w-3 h-3" />
+                  {t.services.discover} <ArrowRight className="w-3 h-3" />
                 </a>
               </div>
               <div className="text-right flex items-end gap-1 h-12">
@@ -247,12 +250,12 @@ export function Services() {
               <div className="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center text-blue-500">
                 <PenTool className="w-5 h-5" />
               </div>
-              <h4 className="font-bold text-slate-900 leading-tight">Design<br/>UI/UX</h4>
+              <h4 className="font-bold text-slate-900 leading-tight whitespace-pre-line">{t.services.cards.design.title}</h4>
             </div>
             <div className="flex items-end justify-between flex-1">
               <div>
                 <a href="#contact" className="inline-flex items-center gap-1.5 text-xs font-semibold text-blue-500 group-hover:gap-2 transition-all">
-                  Découvrir <ArrowRight className="w-3 h-3" />
+                  {t.services.discover} <ArrowRight className="w-3 h-3" />
                 </a>
               </div>
               <div className="bg-slate-50 p-2 rounded-lg border border-slate-100 w-16 h-12 flex flex-col gap-1.5">
@@ -272,12 +275,12 @@ export function Services() {
               <div className="w-10 h-10 rounded-xl bg-indigo-50 flex items-center justify-center text-indigo-500">
                 <Cloud className="w-5 h-5" />
               </div>
-              <h4 className="font-bold text-slate-900 leading-tight">Cloud &<br/>Infrastructure</h4>
+              <h4 className="font-bold text-slate-900 leading-tight whitespace-pre-line">{t.services.cards.cloud.title}</h4>
             </div>
             <div className="flex items-end justify-between flex-1">
               <div>
                 <a href="#contact" className="inline-flex items-center gap-1.5 text-xs font-semibold text-indigo-500 group-hover:gap-2 transition-all">
-                  Découvrir <ArrowRight className="w-3 h-3" />
+                  {t.services.discover} <ArrowRight className="w-3 h-3" />
                 </a>
               </div>
               <div className="flex flex-col gap-1">
@@ -303,22 +306,22 @@ export function Services() {
               <Rocket className="w-5 h-5 text-white" />
             </div>
             <div>
-              <h4 className="text-lg font-bold text-slate-900">Un projet en tête ? Parlons-en.</h4>
-              <p className="text-sm text-slate-500">Nous vous accompagnons de l'idée au lancement.</p>
+              <h4 className="text-lg font-bold text-slate-900">{t.services.ctaBanner.title}</h4>
+              <p className="text-sm text-slate-500">{t.services.ctaBanner.desc}</p>
             </div>
           </div>
           
           <div className="flex items-center flex-col sm:flex-row gap-6 w-full md:w-auto">
             <a href="#contact" className="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-white px-6 py-3.5 rounded-full font-semibold text-sm transition-colors flex items-center justify-center gap-2 shadow-lg shadow-blue-600/20">
-              Discuter avec un expert <ArrowRight className="w-4 h-4" />
+              {t.services.ctaBanner.button} <ArrowRight className="w-4 h-4" />
             </a>
             
             <div className="flex items-center gap-3">
               <div className="flex h-8 items-center justify-center rounded-full bg-blue-50 px-3 border border-blue-100">
                 <Users className="size-4 text-blue-600" />
               </div>
-              <div className="text-xs text-slate-500 font-medium">
-                30+ entreprises<br/>nous font confiance
+              <div className="text-xs text-slate-500 font-medium whitespace-pre-line">
+                {t.services.ctaBanner.trust}
               </div>
             </div>
           </div>
@@ -327,29 +330,21 @@ export function Services() {
         {/* Full List of Services (All 23 services requested by user) */}
         <div className="mt-20">
           <div className="text-center mb-10">
-            <h3 className="text-2xl font-bold text-slate-900">Toutes nos expertises</h3>
-            <p className="text-slate-500 mt-2">Une gamme complète pour répondre à chaque besoin digital.</p>
+            <h3 className="text-2xl font-bold text-slate-900">{t.services.fullList.title}</h3>
+            <p className="text-slate-500 mt-2">{t.services.fullList.desc}</p>
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
             {/* Dev */}
             <div>
               <h4 className="text-lg font-bold text-slate-900 mb-4 flex items-center gap-2">
-                <Code2 className="w-5 h-5 text-blue-600" /> Développement
+                <Code2 className="w-5 h-5 text-blue-600" /> {t.services.fullList.dev}
               </h4>
               <ul className="space-y-3">
-                {[
-                  "Création Site Web",
-                  "Développement Web",
-                  "Développements d'Applications web Full",
-                  "Développement Progressive Web Apps (PWA)",
-                  "Développement E-commerce Avancé",
-                  "Programmation Mobile",
-                  "Logiciels de Gestion sur Mesure (ERP/CRM)"
-                ].map(s => (
-                  <li key={s} className="flex items-start gap-2 text-sm text-slate-600">
+                {t.data.services.slice(0, 8).map(s => (
+                  <li key={s.title} className="flex items-start gap-2 text-sm text-slate-600">
                     <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0 mt-0.5" />
-                    <span>{s}</span>
+                    <span>{s.title}</span>
                   </li>
                 ))}
               </ul>
@@ -358,19 +353,13 @@ export function Services() {
             {/* Design & Création */}
             <div>
               <h4 className="text-lg font-bold text-slate-900 mb-4 flex items-center gap-2">
-                <PenTool className="w-5 h-5 text-blue-600" /> Design & Image
+                <PenTool className="w-5 h-5 text-blue-600" /> {t.services.fullList.design}
               </h4>
               <ul className="space-y-3">
-                {[
-                  "Design d'Interfaces UI/UX Modernes",
-                  "Graphisme",
-                  "Gestion d'Image",
-                  "Photographie",
-                  "Montage Vidéo"
-                ].map(s => (
-                  <li key={s} className="flex items-start gap-2 text-sm text-slate-600">
+                {t.data.services.slice(16, 23).map(s => (
+                  <li key={s.title} className="flex items-start gap-2 text-sm text-slate-600">
                     <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0 mt-0.5" />
-                    <span>{s}</span>
+                    <span>{s.title}</span>
                   </li>
                 ))}
               </ul>
@@ -379,20 +368,13 @@ export function Services() {
             {/* Marketing */}
             <div>
               <h4 className="text-lg font-bold text-slate-900 mb-4 flex items-center gap-2">
-                <Megaphone className="w-5 h-5 text-blue-600" /> Marketing Digital
+                <Megaphone className="w-5 h-5 text-blue-600" /> {t.services.fullList.marketing}
               </h4>
               <ul className="space-y-3">
-                {[
-                  "Référencement Naturel (SEO)",
-                  "Marketing de Recherche Payante (SEA)",
-                  "Community Manager",
-                  "Communication Strategy",
-                  "Marketing par E-mail",
-                  "Publicité"
-                ].map(s => (
-                  <li key={s} className="flex items-start gap-2 text-sm text-slate-600">
+                {t.data.services.slice(9, 12).concat(t.data.services.slice(18, 21)).map(s => (
+                  <li key={s.title} className="flex items-start gap-2 text-sm text-slate-600">
                     <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0 mt-0.5" />
-                    <span>{s}</span>
+                    <span>{s.title}</span>
                   </li>
                 ))}
               </ul>
@@ -401,19 +383,13 @@ export function Services() {
             {/* Infrastructure & Data */}
             <div>
               <h4 className="text-lg font-bold text-slate-900 mb-4 flex items-center gap-2">
-                <Cloud className="w-5 h-5 text-blue-600" /> Infra & Data
+                <Cloud className="w-5 h-5 text-blue-600" /> {t.services.fullList.infra}
               </h4>
               <ul className="space-y-3">
-                {[
-                  "Architecture et Déploiement Cloud",
-                  "Développement d'APIS et Intégrations",
-                  "Conception et Optimisation de Bases de Données",
-                  "Sécurité Informatique",
-                  "Analyse de Données"
-                ].map(s => (
-                  <li key={s} className="flex items-start gap-2 text-sm text-slate-600">
+                {t.data.services.slice(8, 9).concat(t.data.services.slice(12, 16)).map(s => (
+                  <li key={s.title} className="flex items-start gap-2 text-sm text-slate-600">
                     <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0 mt-0.5" />
-                    <span>{s}</span>
+                    <span>{s.title}</span>
                   </li>
                 ))}
               </ul>

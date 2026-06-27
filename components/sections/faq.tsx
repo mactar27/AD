@@ -5,22 +5,23 @@ import { AnimatePresence, motion } from 'framer-motion'
 import { Plus } from 'lucide-react'
 import { SectionHeading } from '@/components/section-heading'
 import { Reveal } from '@/components/reveal'
-import { faqs } from '@/lib/site-data'
+import { useLanguage } from '@/lib/i18n'
 import { cn } from '@/lib/utils'
 
 export function Faq() {
   const [open, setOpen] = useState<number | null>(0)
+  const { t } = useLanguage()
 
   return (
     <section id="faq" className="mx-auto max-w-3xl px-4 py-24 sm:px-6 lg:px-8">
       <SectionHeading
-        eyebrow="FAQ"
-        title="Questions fréquentes"
-        description="Tout ce que vous devez savoir avant de démarrer votre projet avec AD PULSE."
+        eyebrow={t.faq.eyebrow}
+        title={t.faq.title}
+        description={t.faq.description}
       />
 
       <div className="mt-12 space-y-3">
-        {faqs.map((faq, i) => {
+        {t.data.faqs.map((faq, i) => {
           const isOpen = open === i
           return (
             <Reveal key={faq.q} delay={i}>

@@ -4,41 +4,19 @@ import { useEffect, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import Image from 'next/image'
 import { ArrowRight, Globe, Megaphone, PenTool, CheckCircle2 } from 'lucide-react'
+import { useLanguage } from '@/lib/i18n'
 
 const BG = '#ffffff'
 
-const steps = [
-  {
-    icon: Globe,
-    color: '#2563eb',
-    badge: 'Développement Web',
-    title: 'Des sites & apps qui convertissent',
-    description:
-      'Nous créons des expériences web modernes, rapides et optimisées pour transformer vos visiteurs en clients.',
-  },
-  {
-    icon: Megaphone,
-    color: '#f59e0b',
-    badge: 'Marketing Digital',
-    title: 'Visibilité & croissance sur mesure',
-    description:
-      'SEO, SEA, réseaux sociaux et email marketing : nous pilotons votre acquisition digitale pour des résultats concrets.',
-  },
-  {
-    icon: PenTool,
-    color: '#8b5cf6',
-    badge: 'Design & Image',
-    title: 'Une identité visuelle qui marque les esprits',
-    description:
-      'UI/UX, graphisme, photographie et vidéo : nous construisons une image de marque forte et cohérente pour votre entreprise.',
-  },
-]
+const stepIcons = [Globe, Megaphone, PenTool]
+const stepColors = ['#2563eb', '#f59e0b', '#8b5cf6']
 
 export function SplashScreen() {
   const [visible, setVisible] = useState(false)
   const [phase, setPhase] = useState<'logo' | 'onboard'>('logo')
   const [step, setStep] = useState(0)
   const [leaving, setLeaving] = useState(false)
+  const { t } = useLanguage()
 
   useEffect(() => {
     if (sessionStorage.getItem('adpulse_splash_shown')) return
@@ -48,7 +26,7 @@ export function SplashScreen() {
   }, [])
 
   function handleNext() {
-    if (step < steps.length - 1) {
+    if (step < t.splash.steps.length - 1) {
       setStep((s) => s + 1)
     } else {
       dismiss()
@@ -65,8 +43,10 @@ export function SplashScreen() {
 
   if (!visible) return null
 
-  const current = steps[step]
-  const Icon = current.icon
+  const stepsData = t.splash.steps
+  const current = stepsData[step]
+  const Icon = stepIcons[step]
+  const color = stepColors[step]
 
   return (
     <AnimatePresence>
@@ -107,7 +87,7 @@ export function SplashScreen() {
                   animate={{ opacity: [0.85, 1, 0.85] }}
                   transition={{ duration: 2.5, repeat: Infinity, ease: 'easeInOut' }}
                 >
-                  <Image src="/adpulse-logo.png" alt="Ad Pulse" width={280} height={100} className="object-contain" />
+                  <Image src="/splash-logo.png" alt="Ad Pulse" width={280} height={100} className="object-contain" />
                 </motion.div>
 
                 {/* Loading bar */}
@@ -122,7 +102,7 @@ export function SplashScreen() {
                 </div>
 
                 <p style={{ color: '#94a3b8' }} className="text-xs tracking-wider uppercase">
-                  Agence digitale — Dakar
+                  {t.splash.tagline}
                 </p>
               </motion.div>
             )}
@@ -148,15 +128,15 @@ export function SplashScreen() {
                   >
                     {/* Icon */}
                     <div
-                      style={{ background: `${current.color}14`, border: `1px solid ${current.color}30` }}
+                      style={{ background: `${color}14`, border: `1px solid ${color}30` }}
                       className="flex h-20 w-20 items-center justify-center rounded-3xl"
                     >
-                      <Icon style={{ color: current.color }} className="h-10 w-10" />
+                      <Icon style={{ color: color }} className="h-10 w-10" />
                     </div>
 
                     {/* Badge */}
                     <span
-                      style={{ background: `${current.color}10`, border: `1px solid ${current.color}30`, color: current.color }}
+                      style={{ background: `${color}10`, border: `1px solid ${color}30`, color: color }}
                       className="rounded-full px-4 py-1.5 text-[11px] font-bold uppercase tracking-widest"
                     >
                       {current.badge}
@@ -174,9 +154,9 @@ export function SplashScreen() {
 
                     {/* Checklist */}
                     <ul className="w-full max-w-xs space-y-2 text-left">
-                      {['Expertise locale Dakar', 'Livraison rapide', 'Support continu'].map((item) => (
+                      {t.splash.checklist.map((item) => (
                         <li key={item} className="flex items-center gap-3">
-                          <CheckCircle2 style={{ color: current.color }} className="h-4 w-4 shrink-0" />
+                          <CheckCircle2 style={{ color: color }} className="h-4 w-4 shrink-0" />
                           <span style={{ color: '#475569' }} className="text-sm">{item}</span>
                         </li>
                       ))}
@@ -188,14 +168,14 @@ export function SplashScreen() {
                 <div className="absolute bottom-10 flex w-full max-w-sm flex-col items-center gap-5 px-6">
                   {/* Dots */}
                   <div className="flex items-center gap-2">
-                    {steps.map((_, i) => (
+                    {stepsData.map((_, i) => (
                       <button
                         key={i}
                         onClick={() => setStep(i)}
                         style={{
                           width: i === step ? 24 : 8,
                           height: 8,
-                          background: i === step ? current.color : '#e2e8f0',
+                          background: i === step ? color : '#e2e8f0',
                           borderRadius: 999,
                           transition: 'all 0.3s',
                           border: 'none',
@@ -209,25 +189,25 @@ export function SplashScreen() {
                   <button
                     onClick={handleNext}
                     style={{
-                      background: `linear-gradient(135deg, ${current.color}, #1d4ed8)`,
-                      boxShadow: `0 8px 24px ${current.color}40`,
+                      background: `linear-gradient(135deg, ${color}, #1d4ed8)`,
+                      boxShadow: `0 8px 24px ${color}40`,
                     }}
                     className="flex w-full items-center justify-center gap-2 rounded-full py-4 text-sm font-bold text-white transition-transform hover:-translate-y-0.5 active:scale-95"
                   >
-                    {step < steps.length - 1 ? (
-                      <>Suivant <ArrowRight className="h-4 w-4" /></>
+                    {step < stepsData.length - 1 ? (
+                      <>{t.splash.next} <ArrowRight className="h-4 w-4" /></>
                     ) : (
-                      <>Découvrir AD PULSE <ArrowRight className="h-4 w-4" /></>
+                      <>{t.splash.discover} <ArrowRight className="h-4 w-4" /></>
                     )}
                   </button>
 
-                  {step < steps.length - 1 && (
+                  {step < stepsData.length - 1 && (
                     <button
                       onClick={dismiss}
                       style={{ color: '#94a3b8', background: 'none', border: 'none', cursor: 'pointer' }}
                       className="text-xs hover:text-slate-500 transition-colors"
                     >
-                      Passer l'introduction
+                      {t.splash.skip}
                     </button>
                   )}
                 </div>

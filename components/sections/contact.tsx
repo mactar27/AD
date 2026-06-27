@@ -16,6 +16,7 @@ import { SectionHeading } from '@/components/section-heading'
 import { Reveal } from '@/components/reveal'
 import { contactSchema, type ContactFormValues } from '@/lib/contact-schema'
 import { contactInfo } from '@/lib/site-data'
+import { useLanguage } from '@/lib/i18n'
 import { cn } from '@/lib/utils'
 
 const fieldClass =
@@ -23,6 +24,7 @@ const fieldClass =
 
 export function Contact() {
   const [status, setStatus] = useState<'idle' | 'success' | 'error'>('idle')
+  const { t } = useLanguage()
 
   const {
     register,
@@ -51,16 +53,16 @@ export function Contact() {
     { icon: FaFacebook, href: 'https://facebook.com', label: 'Facebook' },
     { icon: FaLinkedin, href: 'https://linkedin.com', label: 'LinkedIn' },
     { icon: FaInstagram, href: 'https://instagram.com', label: 'Instagram' },
-    { icon: MessageCircle, href: `https://wa.me/${contactInfo.whatsapp.replace(/\D/g, '')}`, label: 'WhatsApp' },
+    { icon: MessageCircle, href: `https://wa.me/${contactInfo.whatsapp.replace(/\\D/g, '')}`, label: 'WhatsApp' },
   ]
 
   return (
     <section id="contact" className="bg-secondary/60 py-24">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <SectionHeading
-          eyebrow="Contact"
-          title="Démarrons votre projet ensemble"
-          description="Remplissez le formulaire et notre équipe vous répondra dans les plus brefs délais."
+          eyebrow={t.contact.eyebrow}
+          title={t.contact.title}
+          description={t.contact.description}
         />
 
         <div className="mt-14 grid grid-cols-1 gap-8 lg:grid-cols-5">
@@ -72,31 +74,31 @@ export function Contact() {
               className="rounded-3xl border border-border bg-card p-6 shadow-card sm:p-8"
             >
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                <Field label="Prénom" error={errors.firstName?.message}>
-                  <input className={fieldClass} placeholder="Votre prénom" autoComplete="given-name" {...register('firstName')} />
+                <Field label={t.contact.form.firstName} error={errors.firstName?.message} optionalText={t.contact.form.optional}>
+                  <input className={fieldClass} placeholder={t.contact.form.firstNamePh} autoComplete="given-name" {...register('firstName')} />
                 </Field>
-                <Field label="Nom" error={errors.lastName?.message}>
-                  <input className={fieldClass} placeholder="Votre nom" autoComplete="family-name" {...register('lastName')} />
+                <Field label={t.contact.form.lastName} error={errors.lastName?.message} optionalText={t.contact.form.optional}>
+                  <input className={fieldClass} placeholder={t.contact.form.lastNamePh} autoComplete="family-name" {...register('lastName')} />
                 </Field>
-                <Field label="Entreprise" optional>
-                  <input className={fieldClass} placeholder="Votre société" autoComplete="organization" {...register('company')} />
+                <Field label={t.contact.form.company} optional optionalText={t.contact.form.optional}>
+                  <input className={fieldClass} placeholder={t.contact.form.companyPh} autoComplete="organization" {...register('company')} />
                 </Field>
-                <Field label="Téléphone" optional>
-                  <input className={fieldClass} placeholder="+221 ..." autoComplete="tel" {...register('phone')} />
+                <Field label={t.contact.form.phone} optional optionalText={t.contact.form.optional}>
+                  <input className={fieldClass} placeholder={t.contact.form.phonePh} autoComplete="tel" {...register('phone')} />
                 </Field>
-                <Field label="Email" error={errors.email?.message}>
-                  <input className={fieldClass} type="email" placeholder="votre@email.com" autoComplete="email" {...register('email')} />
+                <Field label={t.contact.form.email} error={errors.email?.message} optionalText={t.contact.form.optional}>
+                  <input className={fieldClass} type="email" placeholder={t.contact.form.emailPh} autoComplete="email" {...register('email')} />
                 </Field>
-                <Field label="Sujet" error={errors.subject?.message}>
-                  <input className={fieldClass} placeholder="Objet de votre demande" {...register('subject')} />
+                <Field label={t.contact.form.subject} error={errors.subject?.message} optionalText={t.contact.form.optional}>
+                  <input className={fieldClass} placeholder={t.contact.form.subjectPh} {...register('subject')} />
                 </Field>
               </div>
               <div className="mt-4">
-                <Field label="Message" error={errors.message?.message}>
+                <Field label={t.contact.form.message} error={errors.message?.message} optionalText={t.contact.form.optional}>
                   <textarea
                     rows={5}
                     className={cn(fieldClass, 'resize-y')}
-                    placeholder="Décrivez votre projet..."
+                    placeholder={t.contact.form.messagePh}
                     {...register('message')}
                   />
                 </Field>
@@ -106,14 +108,14 @@ export function Contact() {
                 <div className="mt-4 flex items-start gap-3 rounded-xl bg-emerald-50 border border-emerald-200 p-4 text-emerald-800">
                   <CheckCircle2 className="size-5 shrink-0 text-emerald-600 mt-0.5" />
                   <div>
-                    <p className="text-sm font-bold">Message envoyé avec succès !</p>
-                    <p className="text-xs mt-1">Merci de nous avoir contactés. Un membre de l'équipe AD PULSE vous répondra très rapidement.</p>
+                    <p className="text-sm font-bold">{t.contact.successTitle}</p>
+                    <p className="text-xs mt-1">{t.contact.successMsg}</p>
                   </div>
                 </div>
               )}
               {status === 'error' && (
                 <p className="mt-4 rounded-xl bg-destructive/10 px-4 py-3 text-sm font-medium text-destructive">
-                  Une erreur est survenue. Veuillez réessayer.
+                  {t.chatbot.error}
                 </p>
               )}
 
@@ -123,7 +125,7 @@ export function Contact() {
                 className="mt-6 inline-flex w-full items-center justify-center gap-2 rounded-full bg-brand-gradient px-7 py-3.5 text-sm font-semibold text-primary-foreground shadow-soft transition-transform hover:-translate-y-0.5 disabled:opacity-60 sm:w-auto"
               >
                 {isSubmitting && <Loader2 className="size-4 animate-spin" />}
-                {isSubmitting ? 'Envoi en cours...' : 'Envoyer le message'}
+                {isSubmitting ? t.contact.sending : t.contact.submit}
               </button>
             </form>
           </Reveal>
@@ -133,19 +135,19 @@ export function Contact() {
             <div className="flex h-full flex-col gap-6">
               <div className="rounded-3xl border border-border bg-card p-6 shadow-card sm:p-8">
                 <ul className="space-y-5">
-                  <InfoItem icon={MapPin} label="Adresse">{contactInfo.address}</InfoItem>
-                  <InfoItem icon={Phone} label="Téléphone" href={`tel:${contactInfo.phone.replace(/\s/g, '')}`}>
+                  <InfoItem icon={MapPin} label={t.contact.info.address}>{contactInfo.address}</InfoItem>
+                  <InfoItem icon={Phone} label={t.contact.info.phone} href={`tel:${contactInfo.phone.replace(/\\s/g, '')}`}>
                     {contactInfo.phone}
                   </InfoItem>
-                  <InfoItem icon={Mail} label="Email" href={`mailto:${contactInfo.email}`}>
+                  <InfoItem icon={Mail} label={t.contact.info.email} href={`mailto:${contactInfo.email}`}>
                     {contactInfo.email}
                   </InfoItem>
                   <InfoItem
                     icon={MessageCircle}
-                    label="WhatsApp"
-                    href={`https://wa.me/${contactInfo.whatsapp.replace(/\D/g, '')}`}
+                    label={t.contact.info.whatsapp}
+                    href={`https://wa.me/${contactInfo.whatsapp.replace(/\\D/g, '')}`}
                   >
-                    Disponible sur WhatsApp
+                    {t.contact.info.whatsappBtn}
                   </InfoItem>
                 </ul>
                 <div className="mt-6 flex gap-3">
@@ -185,18 +187,20 @@ function Field({
   label,
   error,
   optional,
+  optionalText,
   children,
 }: {
   label: string
   error?: string
   optional?: boolean
+  optionalText?: string
   children: React.ReactNode
 }) {
   return (
     <label className="block">
       <span className="mb-1.5 flex items-center gap-1 text-sm font-medium text-foreground">
         {label}
-        {optional && <span className="text-xs font-normal text-muted-foreground">(optionnel)</span>}
+        {optional && <span className="text-xs font-normal text-muted-foreground">({optionalText})</span>}
       </span>
       {children}
       {error && <span className="mt-1 block text-xs text-destructive">{error}</span>}

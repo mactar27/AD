@@ -2,16 +2,19 @@
 
 import { motion } from 'framer-motion'
 import { SectionHeading } from '@/components/section-heading'
-import { processSteps } from '@/lib/site-data'
+import { processSteps as originalProcessSteps } from '@/lib/site-data'
+import { useLanguage } from '@/lib/i18n'
 
 export function Process() {
+  const { t } = useLanguage()
+
   return (
     <section id="processus" className="bg-secondary/60 py-24">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <SectionHeading
-          eyebrow="Notre processus"
-          title="Une méthodologie claire et efficace"
-          description="Sept étapes maîtrisées pour transformer votre idée en une solution prête à grandir."
+          eyebrow={t.process.eyebrow}
+          title={t.process.title}
+          description={t.process.description}
         />
 
         <div className="relative mt-16">
@@ -21,8 +24,8 @@ export function Process() {
             className="absolute left-0 right-0 top-7 hidden h-0.5 bg-gradient-to-r from-brand/20 via-brand to-brand-light/30 lg:block"
           />
           <ol className="grid grid-cols-1 gap-10 sm:grid-cols-2 lg:grid-cols-7 lg:gap-4">
-            {processSteps.map((step, i) => {
-              const Icon = step.icon
+            {t.data.processSteps.map((step, i) => {
+              const Icon = originalProcessSteps[i].icon
               return (
                 <motion.li
                   key={step.title}

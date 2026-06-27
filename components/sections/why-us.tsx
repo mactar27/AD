@@ -2,9 +2,12 @@
 
 import { motion } from 'framer-motion'
 import { SectionHeading } from '@/components/section-heading'
-import { reasons } from '@/lib/site-data'
+import { reasons as originalReasons } from '@/lib/site-data'
+import { useLanguage } from '@/lib/i18n'
 
 export function WhyUs() {
+  const { t } = useLanguage()
+
   return (
     <section id="pourquoi" className="bg-brand-dark relative overflow-hidden py-24">
       <div aria-hidden="true" className="pointer-events-none absolute inset-0">
@@ -16,14 +19,14 @@ export function WhyUs() {
       <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <SectionHeading
           light
-          eyebrow="Pourquoi choisir AD PULSE ?"
-          title="Votre succès est notre mission"
-          description="Nous combinons expertise, créativité et technologie pour fournir des solutions qui font vraiment la différence."
+          eyebrow={t.whyUs.eyebrow}
+          title={t.whyUs.title}
+          description={t.whyUs.description}
         />
 
         <div className="mt-14 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          {reasons.map((reason, i) => {
-            const Icon = reason.icon
+          {t.data.reasons.map((reason, i) => {
+            const Icon = originalReasons[i].icon
             return (
               <motion.div
                 key={reason.title}

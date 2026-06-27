@@ -1,19 +1,14 @@
 "use client"
 
-import { useState, useRef, useEffect } from "react"
+import { useState, useRef, useEffect, useCallback } from "react"
 import Image from "next/image"
 import { motion, AnimatePresence } from "framer-motion"
-import { X, Send, ChevronRight } from "lucide-react"
+import { X, Send, ChevronRight, Mic, MicOff, Volume2, VolumeX } from "lucide-react"
 import { useChat, type UIMessage } from "@ai-sdk/react"
 import { TextStreamChatTransport, isTextUIPart } from "ai"
+import { useLanguage } from "@/lib/i18n"
 
-const SUGGESTIONS = [
-  "Quels sont vos services ?",
-  "Demander un devis",
-  "Voir les réalisations",
-  "Contactez-nous",
-]
-
+// ── helpers ──────────────────────────────────────────────────
 function getMessageText(message: UIMessage): string {
   if (message.parts) {
     return message.parts
@@ -24,7 +19,23 @@ function getMessageText(message: UIMessage): string {
   return (message as any).content || (message as any).text || ""
 }
 
-/* ─── Message bubble ─────────────────────────────────────── */
+function stripMarkdown(text: string): string {
+  return text
+    .replace(/\*\*(.+?)\*\*/g, "$1")
+    .replace(/\*(.+?)\*/g, "$1")
+    .replace(/<br\/?>/g, " ")
+    .replace(/<[^>]+>/g, "")
+}
+
+// ── SpeechRecognition types ───────────────────────────────────
+declare global {
+  interface Window {
+    SpeechRecognition: any
+    webkitSpeechRecognition: any
+  }
+}
+
+// ── Bubble ────────────────────────────────────────────────────
 function Bubble({ message }: { message: UIMessage }) {
   const isBot = message.role === "assistant"
   const raw = getMessageText(message)
@@ -57,12 +68,18 @@ function Bubble({ message }: { message: UIMessage }) {
   )
 }
 
-/* ─── Main chatbot component ─────────────────────────────── */
+// ── Main chatbot ──────────────────────────────────────────────
 export default function Chatbot() {
+  const { t } = useLanguage()
   const [open, setOpen] = useState(false)
   const [inputValue, setInputValue] = useState("")
+  const [isListening, setIsListening] = useState(false)
+  const [audioEnabled, setAudioEnabled] = useState(true)
+  const [isSpeaking, setIsSpeaking] = useState(false)
   const bottomRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLInputElement>(null)
+  const recognitionRef = useRef<any>(null)
+  const lastSpokenId = useRef<string | null>(null)
 
   const { messages, sendMessage, status, error } = useChat({
     transport: new TextStreamChatTransport({ api: "/api/chat" }),
@@ -73,7 +90,7 @@ export default function Chatbot() {
         parts: [
           {
             type: "text",
-            text: "Bonjour ! 👋 Je suis **Addy**, l'assistante d'AD PULSE. Vous avez un projet d'application mobile, de site web ou de marketing à Dakar ?",
+            text: t.chatbot.welcome,
           },
         ],
       },
@@ -82,10 +99,82 @@ export default function Chatbot() {
 
   const isLoading = status === "streaming" || status === "submitted"
 
+  // ── Text-to-speech ────────────────────────────────────────
+  const speak = useCallback((text: string) => {
+    if (!audioEnabled || typeof window === "undefined" || !window.speechSynthesis) return
+    window.speechSynthesis.cancel()
+    const utterance = new SpeechSynthesisUtterance(stripMarkdown(text))
+    utterance.lang = t.chatbot.lang
+    utterance.rate = 1.05
+    utterance.pitch = 1.1
+    
+    const voices = window.speechSynthesis.getVoices()
+    const preferredVoice = voices.find((v) => v.lang.startsWith(t.chatbot.lang.split('-')[0]))
+    if (preferredVoice) utterance.voice = preferredVoice
+    utterance.onstart = () => setIsSpeaking(true)
+    utterance.onend = () => setIsSpeaking(false)
+    utterance.onerror = () => setIsSpeaking(false)
+    window.speechSynthesis.speak(utterance)
+  }, [audioEnabled, t.chatbot.lang])
+
+  // Speak new bot messages
   useEffect(() => {
-    if (open) {
-      setTimeout(() => inputRef.current?.focus(), 300)
+    if (!audioEnabled) return
+    const botMessages = messages.filter((m) => m.role === "assistant" && getMessageText(m).length > 0)
+    if (botMessages.length === 0) return
+    const last = botMessages[botMessages.length - 1]
+    if (last.id !== lastSpokenId.current && !isLoading) {
+      lastSpokenId.current = last.id
+      speak(getMessageText(last))
     }
+  }, [messages, isLoading, audioEnabled, speak])
+
+  // Stop speech when audio disabled
+  useEffect(() => {
+    if (!audioEnabled && typeof window !== "undefined") {
+      window.speechSynthesis?.cancel()
+      setIsSpeaking(false)
+    }
+  }, [audioEnabled])
+
+  // ── Speech recognition ────────────────────────────────────
+  const startListening = useCallback(() => {
+    const SR = window.SpeechRecognition || window.webkitSpeechRecognition
+    if (!SR) {
+      alert(t.chatbot.voiceNotSupported)
+      return
+    }
+    const recognition = new SR()
+    recognition.lang = t.chatbot.lang
+    recognition.continuous = false
+    recognition.interimResults = false
+
+    recognition.onstart = () => setIsListening(true)
+    recognition.onresult = (event: any) => {
+      const transcript = event.results[0][0].transcript
+      setInputValue(transcript)
+      setIsListening(false)
+    }
+    recognition.onerror = () => setIsListening(false)
+    recognition.onend = () => setIsListening(false)
+
+    recognitionRef.current = recognition
+    recognition.start()
+  }, [t.chatbot.lang, t.chatbot.voiceNotSupported])
+
+  const stopListening = useCallback(() => {
+    recognitionRef.current?.stop()
+    setIsListening(false)
+  }, [])
+
+  const toggleMic = () => {
+    if (isListening) stopListening()
+    else startListening()
+  }
+
+  // ── Focus input on open ───────────────────────────────────
+  useEffect(() => {
+    if (open) setTimeout(() => inputRef.current?.focus(), 300)
   }, [open])
 
   useEffect(() => {
@@ -124,15 +213,33 @@ export default function Chatbot() {
             <div className="flex items-center gap-3 px-4 py-3.5" style={{ background: "linear-gradient(135deg, #073d8c 0%, #0a56c5 45%, #22a8ff 100%)" }}>
               <span className="relative flex size-10 items-center justify-center overflow-hidden rounded-full bg-white shadow-sm ring-1 ring-white/20 p-1">
                 <Image src="/icon.png" alt="Addy" width={28} height={28} className="size-full object-contain" />
+                {/* Speaking animation */}
+                {isSpeaking && (
+                  <span className="absolute inset-0 rounded-full">
+                    <motion.span
+                      className="absolute inset-0 rounded-full bg-blue-400/40"
+                      animate={{ scale: [1, 1.5], opacity: [0.6, 0] }}
+                      transition={{ duration: 0.9, repeat: Infinity }}
+                    />
+                  </span>
+                )}
                 <span className="absolute -right-0.5 -top-0.5 size-2.5 rounded-full bg-emerald-400 ring-2 ring-[#073d8c]" />
               </span>
               <div className="min-w-0 flex-1">
                 <p className="text-sm font-semibold leading-tight text-white">Addy — AD PULSE</p>
                 <p className="flex items-center gap-1 text-xs text-white/70">
                   <span className="inline-block size-1.5 rounded-full bg-emerald-400" />
-                  En ligne
+                  {isSpeaking ? t.chatbot.speaking : t.chatbot.online}
                 </p>
               </div>
+              {/* Audio toggle */}
+              <button
+                onClick={() => setAudioEnabled((v) => !v)}
+                title={audioEnabled ? t.chatbot.muteLabel : t.chatbot.unmuteLabel}
+                className="flex size-7 items-center justify-center rounded-full text-white/70 transition-colors hover:bg-white/10 hover:text-white"
+              >
+                {audioEnabled ? <Volume2 className="size-4" /> : <VolumeX className="size-4" />}
+              </button>
               <button
                 onClick={() => setOpen(false)}
                 className="flex size-7 items-center justify-center rounded-full text-white/60 transition-colors hover:bg-white/10 hover:text-white"
@@ -175,7 +282,7 @@ export default function Chatbot() {
 
               {error && (
                 <p className="rounded-xl border border-red-500/30 bg-red-50 px-3 py-2 text-xs text-red-500">
-                  Une erreur est survenue. Veuillez réessayer.
+                  {t.chatbot.error}
                 </p>
               )}
 
@@ -185,7 +292,7 @@ export default function Chatbot() {
             {/* Suggestions */}
             {visibleMessages.length <= 1 && !isLoading && (
               <div className="flex flex-wrap gap-1.5 px-4 pb-2 bg-white border-t border-gray-100 pt-2">
-                {SUGGESTIONS.map((s) => (
+                {t.chatbot.suggestions.map((s) => (
                   <button
                     key={s}
                     onClick={() => handleSend(s)}
@@ -199,14 +306,47 @@ export default function Chatbot() {
             )}
 
             {/* Input */}
-            <form onSubmit={handleSubmit} className="flex gap-2 border-t border-gray-200 px-4 py-3 bg-white">
+            <form onSubmit={handleSubmit} className="flex items-center gap-2 border-t border-gray-200 px-4 py-3 bg-white">
+              {/* Mic button */}
+              <button
+                type="button"
+                onClick={toggleMic}
+                title={isListening ? t.chatbot.stopMicLabel : t.chatbot.micLabel}
+                className="flex size-9 shrink-0 items-center justify-center rounded-xl transition-all"
+                style={{
+                  background: isListening
+                    ? "linear-gradient(135deg, #dc2626, #ef4444)"
+                    : "#f1f5f9",
+                  boxShadow: isListening ? "0 0 0 4px rgba(220,38,38,0.2)" : "none",
+                }}
+              >
+                <AnimatePresence mode="wait" initial={false}>
+                  {isListening ? (
+                    <motion.span key="on" initial={{ scale: 0.7 }} animate={{ scale: 1 }} exit={{ scale: 0.7 }}>
+                      <motion.span
+                        animate={{ scale: [1, 1.2, 1] }}
+                        transition={{ duration: 0.7, repeat: Infinity }}
+                        className="block"
+                      >
+                        <MicOff className="size-4 text-white" />
+                      </motion.span>
+                    </motion.span>
+                  ) : (
+                    <motion.span key="off" initial={{ scale: 0.7 }} animate={{ scale: 1 }} exit={{ scale: 0.7 }}>
+                      <Mic className="size-4 text-gray-500" />
+                    </motion.span>
+                  )}
+                </AnimatePresence>
+              </button>
+
               <input
                 ref={inputRef}
                 value={inputValue}
                 onChange={(e) => setInputValue(e.target.value)}
-                placeholder="Écrivez un message…"
+                placeholder={isListening ? t.chatbot.listening : t.chatbot.placeholder}
                 className="min-w-0 flex-1 rounded-xl border border-gray-200 bg-white px-3 py-2 text-sm outline-none transition-colors placeholder:text-gray-400 focus:border-[#0a56c5] focus:ring-2 focus:ring-[#0a56c5]/20 text-gray-800"
               />
+
               <button
                 type="submit"
                 disabled={!inputValue.trim() || isLoading}
@@ -225,7 +365,7 @@ export default function Chatbot() {
         onClick={() => setOpen((o) => !o)}
         whileHover={{ scale: 1.08 }}
         whileTap={{ scale: 0.95 }}
-        aria-label="Discuter avec Addy"
+        aria-label={t.chatbot.ariaLabel}
         className="relative flex size-14 items-center justify-center rounded-full bg-white shadow-xl shadow-black/20 overflow-hidden"
       >
         {!open && (

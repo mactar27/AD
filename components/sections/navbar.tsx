@@ -4,12 +4,13 @@ import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { Menu, X, ArrowRight } from 'lucide-react'
 import { Logo } from '@/components/logo'
-import { navLinks } from '@/lib/site-data'
 import { cn } from '@/lib/utils'
+import { useLanguage } from '@/lib/i18n'
 
 export function Navbar() {
   const [scrolled, setScrolled] = useState(false)
   const [open, setOpen] = useState(false)
+  const { lang, setLang, t } = useLanguage()
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 16)
@@ -17,6 +18,8 @@ export function Navbar() {
     window.addEventListener('scroll', onScroll, { passive: true })
     return () => window.removeEventListener('scroll', onScroll)
   }, [])
+
+  const navLinks = t.data.navLinks
 
   return (
     <header
@@ -46,12 +49,38 @@ export function Navbar() {
           ))}
         </ul>
 
-        <div className="hidden lg:block">
+        <div className="hidden lg:flex items-center gap-3">
+          {/* Language toggle */}
+          <div className="flex items-center gap-1 rounded-full border border-border bg-card p-1">
+            <button
+              onClick={() => setLang('fr')}
+              className={cn(
+                'rounded-full px-3 py-1 text-xs font-bold transition-all',
+                lang === 'fr'
+                  ? 'bg-brand-gradient text-white shadow-sm'
+                  : 'text-muted-foreground hover:text-foreground',
+              )}
+            >
+              FR
+            </button>
+            <button
+              onClick={() => setLang('en')}
+              className={cn(
+                'rounded-full px-3 py-1 text-xs font-bold transition-all',
+                lang === 'en'
+                  ? 'bg-brand-gradient text-white shadow-sm'
+                  : 'text-muted-foreground hover:text-foreground',
+              )}
+            >
+              EN
+            </button>
+          </div>
+
           <a
             href="#contact"
             className="inline-flex items-center gap-2 rounded-full bg-brand-gradient px-5 py-2.5 text-sm font-semibold text-primary-foreground shadow-soft transition-transform hover:-translate-y-0.5"
           >
-            Commencer un projet
+            {t.nav.cta}
             <ArrowRight className="size-4" />
           </a>
         </div>
@@ -81,13 +110,38 @@ export function Navbar() {
                 </a>
               </li>
             ))}
+            {/* Language toggle mobile */}
+            <li className="flex gap-2 px-3 pt-1">
+              <button
+                onClick={() => setLang('fr')}
+                className={cn(
+                  'rounded-full px-4 py-1.5 text-xs font-bold border transition-all',
+                  lang === 'fr'
+                    ? 'bg-brand-gradient text-white border-transparent shadow-sm'
+                    : 'border-border text-muted-foreground',
+                )}
+              >
+                🇫🇷 Français
+              </button>
+              <button
+                onClick={() => setLang('en')}
+                className={cn(
+                  'rounded-full px-4 py-1.5 text-xs font-bold border transition-all',
+                  lang === 'en'
+                    ? 'bg-brand-gradient text-white border-transparent shadow-sm'
+                    : 'border-border text-muted-foreground',
+                )}
+              >
+                🇬🇧 English
+              </button>
+            </li>
             <li className="pt-2">
               <a
                 href="#contact"
                 onClick={() => setOpen(false)}
                 className="flex items-center justify-center gap-2 rounded-full bg-brand-gradient px-5 py-3 text-sm font-semibold text-primary-foreground"
               >
-                Commencer un projet
+                {t.nav.cta}
                 <ArrowRight className="size-4" />
               </a>
             </li>

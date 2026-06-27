@@ -3,6 +3,7 @@ import type { Metadata, Viewport } from 'next'
 import { Poppins, Inter } from 'next/font/google'
 import { ChatbotLazy } from '@/components/chatbot-lazy'
 import { SplashScreenLazy } from '@/components/splash-screen-lazy'
+import { LanguageProvider } from '@/lib/i18n'
 import './globals.css'
 
 const inter = Inter({
@@ -105,9 +106,11 @@ export default function RootLayout({
         />
       </head>
       <body className="bg-background font-sans antialiased">
-        <SplashScreenLazy />
-        {children}
-        <ChatbotLazy />
+        <LanguageProvider>
+          <SplashScreenLazy />
+          {children}
+          <ChatbotLazy />
+        </LanguageProvider>
         {process.env.NODE_ENV === 'production' && <Analytics />}
       </body>
     </html>
