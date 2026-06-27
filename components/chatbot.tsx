@@ -42,7 +42,7 @@ function Bubble({ message }: { message: UIMessage }) {
     >
       {isBot && (
         <span className="mt-0.5 flex size-8 shrink-0 items-center justify-center rounded-full bg-white shadow-sm ring-1 ring-gray-200 overflow-hidden p-1">
-          <Image src="/icon.png" alt="Assistant AD PULSE" width={24} height={24} className="size-full object-contain" />
+          <Image src="/icon.png" alt="Addy" width={24} height={24} className="size-full object-contain" />
         </span>
       )}
       <div
@@ -73,7 +73,7 @@ export default function Chatbot() {
         parts: [
           {
             type: "text",
-            text: "Bonjour ! 👋 Je suis l'assistant AD PULSE. Vous avez un projet d'application mobile, de site web ou de marketing à Dakar ?",
+            text: "Bonjour ! 👋 Je suis **Addy**, l'assistante d'AD PULSE. Vous avez un projet d'application mobile, de site web ou de marketing à Dakar ?",
           },
         ],
       },
@@ -123,11 +123,11 @@ export default function Chatbot() {
             {/* Header */}
             <div className="flex items-center gap-3 px-4 py-3.5" style={{ background: "linear-gradient(135deg, #073d8c 0%, #0a56c5 45%, #22a8ff 100%)" }}>
               <span className="relative flex size-10 items-center justify-center overflow-hidden rounded-full bg-white shadow-sm ring-1 ring-white/20 p-1">
-                <Image src="/icon.png" alt="Assistant AD PULSE" width={28} height={28} className="size-full object-contain" />
+                <Image src="/icon.png" alt="Addy" width={28} height={28} className="size-full object-contain" />
                 <span className="absolute -right-0.5 -top-0.5 size-2.5 rounded-full bg-emerald-400 ring-2 ring-[#073d8c]" />
               </span>
               <div className="min-w-0 flex-1">
-                <p className="text-sm font-semibold leading-tight text-white">Assistant AD PULSE</p>
+                <p className="text-sm font-semibold leading-tight text-white">Addy — AD PULSE</p>
                 <p className="flex items-center gap-1 text-xs text-white/70">
                   <span className="inline-block size-1.5 rounded-full bg-emerald-400" />
                   En ligne
@@ -157,7 +157,7 @@ export default function Chatbot() {
                     className="flex items-center gap-2"
                   >
                     <span className="flex size-8 shrink-0 items-center justify-center overflow-hidden rounded-full bg-white shadow-sm ring-1 ring-gray-200 p-1">
-                      <Image src="/icon.png" alt="Assistant" width={24} height={24} className="size-full object-contain" />
+                      <Image src="/icon.png" alt="Addy" width={24} height={24} className="size-full object-contain" />
                     </span>
                     <span className="flex gap-1 rounded-2xl rounded-tl-sm border border-gray-200 bg-white px-4 py-3">
                       {[0, 1, 2].map((i) => (
@@ -225,7 +225,7 @@ export default function Chatbot() {
         onClick={() => setOpen((o) => !o)}
         whileHover={{ scale: 1.08 }}
         whileTap={{ scale: 0.95 }}
-        aria-label="Ouvrir le chatbot AD PULSE"
+        aria-label="Discuter avec Addy"
         className="relative flex size-14 items-center justify-center rounded-full bg-white shadow-xl shadow-black/20 overflow-hidden"
       >
         {!open && (
@@ -255,7 +255,7 @@ export default function Chatbot() {
               transition={{ duration: 0.15 }}
               className="flex size-full items-center justify-center rounded-full p-2.5"
             >
-              <Image src="/icon.png" alt="Assistant AD PULSE" width={40} height={40} className="size-full object-contain" priority />
+              <Image src="/icon.png" alt="Addy" width={40} height={40} className="size-full object-contain" priority />
             </motion.span>
           )}
         </AnimatePresence>
