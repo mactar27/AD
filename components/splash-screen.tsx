@@ -31,7 +31,8 @@ export function SplashScreen() {
           initial={{ opacity: 1 }}
           exit={{ opacity: 0, scale: 1.04 }}
           transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
-          className="fixed inset-0 z-[9999] flex items-center justify-center overflow-hidden bg-[#0a1628]"
+          className="fixed inset-0 z-[9999] flex items-center justify-center overflow-hidden"
+          style={{ background: '#0a1628' }}
         >
           {/* Animated gradient blobs */}
           <div className="pointer-events-none absolute inset-0 overflow-hidden">
