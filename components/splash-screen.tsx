@@ -42,7 +42,6 @@ export function SplashScreen() {
 
   useEffect(() => {
     if (sessionStorage.getItem('adpulse_splash_shown')) return
-    sessionStorage.setItem('adpulse_splash_shown', '1')
     setVisible(true)
     const t = setTimeout(() => setPhase('onboard'), 5000)
     return () => clearTimeout(t)
@@ -57,6 +56,7 @@ export function SplashScreen() {
   }
 
   function dismiss() {
+    sessionStorage.setItem('adpulse_splash_shown', '1')
     setLeaving(true)
     document.documentElement.style.background = ''
     document.documentElement.style.overflow = ''
