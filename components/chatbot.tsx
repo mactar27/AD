@@ -3,7 +3,7 @@
 import { useState, useRef, useEffect, useCallback } from "react"
 import Image from "next/image"
 import { motion, AnimatePresence } from "framer-motion"
-import { X, Send, ChevronRight, Mic, MicOff, Volume2, VolumeX } from "lucide-react"
+import { X, Send, ChevronRight, Mic, MicOff, Keyboard } from "lucide-react"
 import { useChat, type UIMessage } from "@ai-sdk/react"
 import { TextStreamChatTransport, isTextUIPart } from "ai"
 import { useLanguage } from "@/lib/i18n"
@@ -74,12 +74,12 @@ export default function Chatbot() {
   const [open, setOpen] = useState(false)
   const [inputValue, setInputValue] = useState("")
   const [isListening, setIsListening] = useState(false)
-  const [audioEnabled, setAudioEnabled] = useState(true)
   const [isSpeaking, setIsSpeaking] = useState(false)
+  const [voiceMode, setVoiceMode] = useState(false) // <--- New Voice Mode state
   const bottomRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLInputElement>(null)
   const recognitionRef = useRef<any>(null)
-  const lastSpokenId = useRef<string | null>(null)
+  const lastSpokenId = useRef<string | null>('welcome')
 
   const { messages, sendMessage, status, error } = useChat({
     transport: new TextStreamChatTransport({ api: "/api/chat" }),
@@ -101,7 +101,7 @@ export default function Chatbot() {
 
   // ── Text-to-speech ────────────────────────────────────────
   const speak = useCallback((text: string) => {
-    if (!audioEnabled || typeof window === "undefined" || !window.speechSynthesis) return
+    if (typeof window === "undefined" || !window.speechSynthesis) return
     window.speechSynthesis.cancel()
     const utterance = new SpeechSynthesisUtterance(stripMarkdown(text))
     utterance.lang = t.chatbot.lang
@@ -115,11 +115,11 @@ export default function Chatbot() {
     utterance.onend = () => setIsSpeaking(false)
     utterance.onerror = () => setIsSpeaking(false)
     window.speechSynthesis.speak(utterance)
-  }, [audioEnabled, t.chatbot.lang])
+  }, [t.chatbot.lang])
 
-  // Speak new bot messages
+  // Auto-speak new messages ONLY IF voiceMode is true
   useEffect(() => {
-    if (!audioEnabled) return
+    if (!voiceMode) return
     const botMessages = messages.filter((m) => m.role === "assistant" && getMessageText(m).length > 0)
     if (botMessages.length === 0) return
     const last = botMessages[botMessages.length - 1]
@@ -127,15 +127,15 @@ export default function Chatbot() {
       lastSpokenId.current = last.id
       speak(getMessageText(last))
     }
-  }, [messages, isLoading, audioEnabled, speak])
+  }, [messages, isLoading, voiceMode, speak])
 
-  // Stop speech when audio disabled
+  // Stop speech if voiceMode is disabled manually
   useEffect(() => {
-    if (!audioEnabled && typeof window !== "undefined") {
+    if (!voiceMode && typeof window !== "undefined") {
       window.speechSynthesis?.cancel()
       setIsSpeaking(false)
     }
-  }, [audioEnabled])
+  }, [voiceMode])
 
   // ── Speech recognition ────────────────────────────────────
   const startListening = useCallback(() => {
@@ -149,18 +149,28 @@ export default function Chatbot() {
     recognition.continuous = false
     recognition.interimResults = false
 
-    recognition.onstart = () => setIsListening(true)
+    recognition.onstart = () => {
+      setIsListening(true)
+      setVoiceMode(true) // Enter voice mode
+    }
+    
     recognition.onresult = (event: any) => {
       const transcript = event.results[0][0].transcript
       setInputValue(transcript)
       setIsListening(false)
+      // Auto-send when voice is captured
+      if (transcript.trim() && !isLoading) {
+        setInputValue("")
+        sendMessage({ text: transcript.trim() })
+      }
     }
+    
     recognition.onerror = () => setIsListening(false)
     recognition.onend = () => setIsListening(false)
 
     recognitionRef.current = recognition
     recognition.start()
-  }, [t.chatbot.lang, t.chatbot.voiceNotSupported])
+  }, [t.chatbot.lang, t.chatbot.voiceNotSupported, isLoading, sendMessage])
 
   const stopListening = useCallback(() => {
     recognitionRef.current?.stop()
@@ -174,23 +184,26 @@ export default function Chatbot() {
 
   // ── Focus input on open ───────────────────────────────────
   useEffect(() => {
-    if (open) setTimeout(() => inputRef.current?.focus(), 300)
-  }, [open])
+    if (open && !voiceMode) setTimeout(() => inputRef.current?.focus(), 300)
+  }, [open, voiceMode])
 
   useEffect(() => {
-    bottomRef.current?.scrollIntoView({ behavior: "smooth" })
-  }, [messages, isLoading])
+    if (!voiceMode) {
+      bottomRef.current?.scrollIntoView({ behavior: "smooth" })
+    }
+  }, [messages, isLoading, voiceMode])
 
-  const handleSend = (text: string) => {
+  const handleSendText = (text: string) => {
     const msg = text.trim()
     if (!msg || isLoading) return
+    setVoiceMode(false) // Manual text send disables voice mode
     setInputValue("")
     sendMessage({ text: msg })
   }
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    handleSend(inputValue)
+    handleSendText(inputValue)
   }
 
   const visibleMessages = messages.filter((m) => getMessageText(m).length > 0)
@@ -207,7 +220,7 @@ export default function Chatbot() {
             exit={{ opacity: 0, scale: 0.92, y: 16 }}
             transition={{ type: "spring", stiffness: 340, damping: 28 }}
             className="flex w-[340px] flex-col overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-2xl shadow-black/20 sm:w-[380px]"
-            style={{ maxHeight: "min(560px, 80vh)" }}
+            style={{ maxHeight: "min(560px, 80vh)", height: voiceMode ? "450px" : "auto" }}
           >
             {/* Header */}
             <div className="flex items-center gap-3 px-4 py-3.5" style={{ background: "linear-gradient(135deg, #073d8c 0%, #0a56c5 45%, #22a8ff 100%)" }}>
@@ -232,14 +245,18 @@ export default function Chatbot() {
                   {isSpeaking ? t.chatbot.speaking : t.chatbot.online}
                 </p>
               </div>
-              {/* Audio toggle */}
-              <button
-                onClick={() => setAudioEnabled((v) => !v)}
-                title={audioEnabled ? t.chatbot.muteLabel : t.chatbot.unmuteLabel}
-                className="flex size-7 items-center justify-center rounded-full text-white/70 transition-colors hover:bg-white/10 hover:text-white"
-              >
-                {audioEnabled ? <Volume2 className="size-4" /> : <VolumeX className="size-4" />}
-              </button>
+              
+              {/* Toggle Mode Button */}
+              {voiceMode && (
+                <button
+                  onClick={() => setVoiceMode(false)}
+                  title="Passer au clavier"
+                  className="flex size-7 items-center justify-center rounded-full text-white/70 transition-colors hover:bg-white/10 hover:text-white"
+                >
+                  <Keyboard className="size-4" />
+                </button>
+              )}
+
               <button
                 onClick={() => setOpen(false)}
                 className="flex size-7 items-center justify-center rounded-full text-white/60 transition-colors hover:bg-white/10 hover:text-white"
@@ -248,54 +265,102 @@ export default function Chatbot() {
               </button>
             </div>
 
-            {/* Messages */}
-            <div className="min-h-0 flex-1 space-y-3 overflow-y-auto px-4 py-4 bg-gray-50">
-              {visibleMessages.map((m) => (
-                <Bubble key={m.id} message={m} />
-              ))}
+            {/* Content Area */}
+            {voiceMode ? (
+              // ── Voice Mode View ──
+              <div className="flex-1 flex flex-col items-center justify-center bg-gray-50 px-6">
+                <div className="relative mb-8 flex items-center justify-center">
+                  {/* Outer pulse when listening or speaking */}
+                  {(isListening || isSpeaking) && (
+                    <motion.div
+                      className="absolute inset-0 rounded-full bg-blue-500"
+                      animate={{ scale: [1, 1.8], opacity: [0.3, 0] }}
+                      transition={{ duration: 1.5, repeat: Infinity }}
+                    />
+                  )}
+                  {(isListening || isSpeaking) && (
+                    <motion.div
+                      className="absolute inset-0 rounded-full bg-blue-400"
+                      animate={{ scale: [1, 1.4], opacity: [0.5, 0] }}
+                      transition={{ duration: 1.5, delay: 0.75, repeat: Infinity }}
+                    />
+                  )}
+                  
+                  <div className="relative z-10 flex size-28 items-center justify-center rounded-full bg-white shadow-xl ring-4 ring-white">
+                    <Image src="/icon.png" alt="Addy" width={72} height={72} className="object-contain" priority />
+                  </div>
+                </div>
 
-              {/* Typing indicator */}
-              <AnimatePresence>
-                {isLoading && (
-                  <motion.div
-                    initial={{ opacity: 0, y: 6 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0 }}
-                    className="flex items-center gap-2"
-                  >
-                    <span className="flex size-8 shrink-0 items-center justify-center overflow-hidden rounded-full bg-white shadow-sm ring-1 ring-gray-200 p-1">
-                      <Image src="/icon.png" alt="Addy" width={24} height={24} className="size-full object-contain" />
-                    </span>
-                    <span className="flex gap-1 rounded-2xl rounded-tl-sm border border-gray-200 bg-white px-4 py-3">
-                      {[0, 1, 2].map((i) => (
-                        <motion.span
-                          key={i}
-                          className="block size-1.5 rounded-full bg-gray-400"
-                          animate={{ y: [0, -4, 0] }}
-                          transition={{ duration: 0.6, repeat: Infinity, delay: i * 0.15 }}
-                        />
-                      ))}
-                    </span>
-                  </motion.div>
+                <div className="text-center h-12 flex items-center justify-center">
+                  <AnimatePresence mode="wait">
+                    <motion.p
+                      key={isListening ? "listening" : isSpeaking ? "speaking" : isLoading ? "loading" : "waiting"}
+                      initial={{ opacity: 0, y: 5 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -5 }}
+                      className="text-lg font-medium text-gray-700"
+                    >
+                      {isListening 
+                        ? t.chatbot.listening 
+                        : isSpeaking 
+                          ? t.chatbot.speaking 
+                          : isLoading 
+                            ? "Addy réfléchit..." 
+                            : "À votre écoute..."}
+                    </motion.p>
+                  </AnimatePresence>
+                </div>
+              </div>
+            ) : (
+              // ── Text Mode View ──
+              <div className="min-h-0 flex-1 space-y-3 overflow-y-auto px-4 py-4 bg-gray-50 flex flex-col">
+                {visibleMessages.map((m) => (
+                  <Bubble key={m.id} message={m} />
+                ))}
+
+                {/* Typing indicator */}
+                <AnimatePresence>
+                  {isLoading && (
+                    <motion.div
+                      initial={{ opacity: 0, y: 6 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0 }}
+                      className="flex items-center gap-2"
+                    >
+                      <span className="flex size-8 shrink-0 items-center justify-center overflow-hidden rounded-full bg-white shadow-sm ring-1 ring-gray-200 p-1">
+                        <Image src="/icon.png" alt="Addy" width={24} height={24} className="size-full object-contain" />
+                      </span>
+                      <span className="flex gap-1 rounded-2xl rounded-tl-sm border border-gray-200 bg-white px-4 py-3">
+                        {[0, 1, 2].map((i) => (
+                          <motion.span
+                            key={i}
+                            className="block size-1.5 rounded-full bg-gray-400"
+                            animate={{ y: [0, -4, 0] }}
+                            transition={{ duration: 0.6, repeat: Infinity, delay: i * 0.15 }}
+                          />
+                        ))}
+                      </span>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+
+                {error && (
+                  <p className="rounded-xl border border-red-500/30 bg-red-50 px-3 py-2 text-xs text-red-500">
+                    {t.chatbot.error}
+                  </p>
                 )}
-              </AnimatePresence>
 
-              {error && (
-                <p className="rounded-xl border border-red-500/30 bg-red-50 px-3 py-2 text-xs text-red-500">
-                  {t.chatbot.error}
-                </p>
-              )}
+                <div ref={bottomRef} className="mt-auto pt-2" />
+              </div>
+            )}
 
-              <div ref={bottomRef} />
-            </div>
-
-            {/* Suggestions */}
-            {visibleMessages.length <= 1 && !isLoading && (
-              <div className="flex flex-wrap gap-1.5 px-4 pb-2 bg-white border-t border-gray-100 pt-2">
+            {/* Suggestions (Only in Text Mode) */}
+            {!voiceMode && visibleMessages.length <= 1 && !isLoading && (
+              <div className="flex flex-wrap gap-1.5 px-4 pb-2 bg-white border-t border-gray-100 pt-2 shrink-0">
                 {t.chatbot.suggestions.map((s) => (
                   <button
                     key={s}
-                    onClick={() => handleSend(s)}
+                    onClick={() => handleSendText(s)}
                     className="inline-flex items-center gap-1 rounded-full border border-gray-200 bg-white px-3 py-1 text-xs font-medium text-gray-700 transition-colors hover:border-[#0a56c5] hover:text-[#0a56c5]"
                   >
                     {s}
@@ -306,56 +371,66 @@ export default function Chatbot() {
             )}
 
             {/* Input */}
-            <form onSubmit={handleSubmit} className="flex items-center gap-2 border-t border-gray-200 px-4 py-3 bg-white">
-              {/* Mic button */}
-              <button
-                type="button"
-                onClick={toggleMic}
-                title={isListening ? t.chatbot.stopMicLabel : t.chatbot.micLabel}
-                className="flex size-9 shrink-0 items-center justify-center rounded-xl transition-all"
-                style={{
-                  background: isListening
-                    ? "linear-gradient(135deg, #dc2626, #ef4444)"
-                    : "#f1f5f9",
-                  boxShadow: isListening ? "0 0 0 4px rgba(220,38,38,0.2)" : "none",
-                }}
-              >
-                <AnimatePresence mode="wait" initial={false}>
-                  {isListening ? (
-                    <motion.span key="on" initial={{ scale: 0.7 }} animate={{ scale: 1 }} exit={{ scale: 0.7 }}>
-                      <motion.span
-                        animate={{ scale: [1, 1.2, 1] }}
-                        transition={{ duration: 0.7, repeat: Infinity }}
-                        className="block"
-                      >
-                        <MicOff className="size-4 text-white" />
+            <div className="border-t border-gray-200 px-4 py-3 bg-white shrink-0">
+              <form onSubmit={handleSubmit} className="flex items-center gap-2">
+                {/* Mic button */}
+                <button
+                  type="button"
+                  onClick={toggleMic}
+                  title={isListening ? t.chatbot.stopMicLabel : t.chatbot.micLabel}
+                  className="flex size-9 shrink-0 items-center justify-center rounded-xl transition-all"
+                  style={{
+                    background: isListening
+                      ? "linear-gradient(135deg, #dc2626, #ef4444)"
+                      : voiceMode
+                        ? "linear-gradient(135deg, #073d8c, #0a56c5)"
+                        : "#f1f5f9",
+                    boxShadow: isListening ? "0 0 0 4px rgba(220,38,38,0.2)" : "none",
+                  }}
+                >
+                  <AnimatePresence mode="wait" initial={false}>
+                    {isListening ? (
+                      <motion.span key="on" initial={{ scale: 0.7 }} animate={{ scale: 1 }} exit={{ scale: 0.7 }}>
+                        <motion.span
+                          animate={{ scale: [1, 1.2, 1] }}
+                          transition={{ duration: 0.7, repeat: Infinity }}
+                          className="block"
+                        >
+                          <MicOff className="size-4 text-white" />
+                        </motion.span>
                       </motion.span>
-                    </motion.span>
-                  ) : (
-                    <motion.span key="off" initial={{ scale: 0.7 }} animate={{ scale: 1 }} exit={{ scale: 0.7 }}>
-                      <Mic className="size-4 text-gray-500" />
-                    </motion.span>
-                  )}
-                </AnimatePresence>
-              </button>
+                    ) : (
+                      <motion.span key="off" initial={{ scale: 0.7 }} animate={{ scale: 1 }} exit={{ scale: 0.7 }}>
+                        <Mic className={voiceMode ? "size-4 text-white" : "size-4 text-gray-500"} />
+                      </motion.span>
+                    )}
+                  </AnimatePresence>
+                </button>
 
-              <input
-                ref={inputRef}
-                value={inputValue}
-                onChange={(e) => setInputValue(e.target.value)}
-                placeholder={isListening ? t.chatbot.listening : t.chatbot.placeholder}
-                className="min-w-0 flex-1 rounded-xl border border-gray-200 bg-white px-3 py-2 text-sm outline-none transition-colors placeholder:text-gray-400 focus:border-[#0a56c5] focus:ring-2 focus:ring-[#0a56c5]/20 text-gray-800"
-              />
+                <input
+                  ref={inputRef}
+                  value={inputValue}
+                  onChange={(e) => {
+                    setInputValue(e.target.value)
+                    if (voiceMode && e.target.value) setVoiceMode(false) // Typing disables voice mode
+                  }}
+                  onFocus={() => {
+                    if (voiceMode) setVoiceMode(false) // Focusing disables voice mode
+                  }}
+                  placeholder={isListening ? t.chatbot.listening : t.chatbot.placeholder}
+                  className="min-w-0 flex-1 rounded-xl border border-gray-200 bg-white px-3 py-2 text-sm outline-none transition-colors placeholder:text-gray-400 focus:border-[#0a56c5] focus:ring-2 focus:ring-[#0a56c5]/20 text-gray-800"
+                />
 
-              <button
-                type="submit"
-                disabled={!inputValue.trim() || isLoading}
-                className="flex size-9 shrink-0 items-center justify-center rounded-xl transition-all disabled:bg-gray-100 disabled:text-gray-400"
-                style={{ background: !inputValue.trim() || isLoading ? undefined : "linear-gradient(135deg, #073d8c, #0a56c5)" }}
-              >
-                <Send className="size-4 text-white" />
-              </button>
-            </form>
+                <button
+                  type="submit"
+                  disabled={!inputValue.trim() || isLoading}
+                  className="flex size-9 shrink-0 items-center justify-center rounded-xl transition-all disabled:bg-gray-100 disabled:text-gray-400"
+                  style={{ background: !inputValue.trim() || isLoading ? undefined : "linear-gradient(135deg, #073d8c, #0a56c5)" }}
+                >
+                  <Send className="size-4 text-white" />
+                </button>
+              </form>
+            </div>
           </motion.div>
         )}
       </AnimatePresence>
