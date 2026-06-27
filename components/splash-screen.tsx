@@ -103,19 +103,12 @@ export function SplashScreen() {
                 className="flex flex-col items-center gap-6"
               >
                 {/* Logo */}
-                <div
-                  style={{ background: '#f1f5f9', border: '1px solid #e2e8f0' }}
-                  className="flex h-24 w-24 items-center justify-center rounded-3xl overflow-hidden"
+                <motion.div
+                  animate={{ opacity: [0.85, 1, 0.85] }}
+                  transition={{ duration: 2.5, repeat: Infinity, ease: 'easeInOut' }}
                 >
-                  <Image src="/icon.png" alt="AD PULSE" width={64} height={64} className="object-contain" />
-                </div>
-
-                <p
-                  style={{ color: '#0f172a' }}
-                  className="text-2xl font-extrabold tracking-widest"
-                >
-                  AD PULSE
-                </p>
+                  <Image src="/adpulse-logo.png" alt="Ad Pulse" width={280} height={100} className="object-contain" />
+                </motion.div>
 
                 {/* Loading bar */}
                 <div style={{ background: '#e2e8f0' }} className="h-1 w-36 overflow-hidden rounded-full">
