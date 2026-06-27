@@ -2,10 +2,8 @@ import { Analytics } from '@vercel/analytics/next'
 import type { Metadata, Viewport } from 'next'
 import { Poppins, Inter } from 'next/font/google'
 import { ChatbotLazy } from '@/components/chatbot-lazy'
-import dynamic from 'next/dynamic'
+import { SplashScreenLazy } from '@/components/splash-screen-lazy'
 import './globals.css'
-
-const SplashScreen = dynamic(() => import('@/components/splash-screen').then(m => ({ default: m.SplashScreen })), { ssr: false })
 
 const inter = Inter({
   variable: '--font-inter',
@@ -99,7 +97,7 @@ export default function RootLayout({
   return (
     <html lang="fr" className={`${inter.variable} ${poppins.variable}`}>
       <body className="bg-background font-sans antialiased">
-        <SplashScreen />
+        <SplashScreenLazy />
         {children}
         <ChatbotLazy />
         {process.env.NODE_ENV === 'production' && <Analytics />}
