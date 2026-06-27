@@ -17,7 +17,7 @@ export function Logo({
         alt="AD PULSE Logo"
         width={140}
         height={40}
-        className={cn('h-20 w-auto object-contain', variant === 'light' && 'brightness-0 invert')}
+        className={cn('h-24 w-auto object-contain', variant === 'light' && 'brightness-0 invert')}
         priority
       />
     </span>

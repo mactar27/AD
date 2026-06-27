@@ -1,6 +1,5 @@
 import { Navbar } from "@/components/sections/navbar"
 import { Hero } from "@/components/sections/hero"
-import { Stats } from "@/components/sections/stats"
 import { Services } from "@/components/sections/services"
 import { WhyUs } from "@/components/sections/why-us"
 import { Technologies } from "@/components/sections/technologies"
@@ -17,7 +16,6 @@ export default function HomePage() {
     <main className="overflow-x-hidden">
       <Navbar />
       <Hero />
-      <Stats />
       <Services />
       <WhyUs />
       <Technologies />
