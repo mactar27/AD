@@ -73,10 +73,10 @@ export function Contact() {
             >
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                 <Field label="Prénom" error={errors.firstName?.message}>
-                  <input className={fieldClass} placeholder="Jean" autoComplete="given-name" {...register('firstName')} />
+                  <input className={fieldClass} placeholder="Votre prénom" autoComplete="given-name" {...register('firstName')} />
                 </Field>
                 <Field label="Nom" error={errors.lastName?.message}>
-                  <input className={fieldClass} placeholder="Dupont" autoComplete="family-name" {...register('lastName')} />
+                  <input className={fieldClass} placeholder="Votre nom" autoComplete="family-name" {...register('lastName')} />
                 </Field>
                 <Field label="Entreprise" optional>
                   <input className={fieldClass} placeholder="Votre société" autoComplete="organization" {...register('company')} />
@@ -85,7 +85,7 @@ export function Contact() {
                   <input className={fieldClass} placeholder="+221 ..." autoComplete="tel" {...register('phone')} />
                 </Field>
                 <Field label="Email" error={errors.email?.message}>
-                  <input className={fieldClass} type="email" placeholder="jean@exemple.com" autoComplete="email" {...register('email')} />
+                  <input className={fieldClass} type="email" placeholder="votre@email.com" autoComplete="email" {...register('email')} />
                 </Field>
                 <Field label="Sujet" error={errors.subject?.message}>
                   <input className={fieldClass} placeholder="Objet de votre demande" {...register('subject')} />

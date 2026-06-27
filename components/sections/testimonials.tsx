@@ -49,13 +49,9 @@ export function Testimonials() {
                   “{t.quote}”
                 </blockquote>
                 <div className="mt-6 flex items-center gap-4">
-                  <Image
-                    src={t.avatar}
-                    alt={t.name}
-                    width={56}
-                    height={56}
-                    className="size-14 rounded-full border-2 border-background object-cover"
-                  />
+                  <div className="flex size-14 shrink-0 items-center justify-center rounded-full bg-brand/10 text-xl font-bold text-brand border-2 border-background">
+                    {t.name.charAt(0)}
+                  </div>
                   <div>
                     <p className="font-heading font-bold text-foreground">{t.name}</p>
                     <p className="text-sm text-muted-foreground">{t.role}</p>
